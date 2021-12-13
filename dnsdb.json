@@ -17,7 +17,7 @@
         }
     ],
     "python_version": "3",
-    "fips_compliant":true,
+    "fips_compliant": true,
     "latest_tested_versions": [
         "Cloud API, v2.0, 2020-09-20"
     ],

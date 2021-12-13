@@ -14,20 +14,18 @@
 # and limitations under the License.
 from __future__ import print_function, unicode_literals
 
-import dnsdb2
-# Phantom imports
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
-from datetime import datetime
-
-# Local imports
-from dnsdb_consts import *
-
 import json
 import re
 import socket
 import time
+from datetime import datetime
+
+import dnsdb2
+import phantom.app as phantom
+from phantom.action_result import ActionResult
+from phantom.base_connector import BaseConnector
+
+from dnsdb_consts import *
 
 
 class DnsdbConnector(BaseConnector):
@@ -160,7 +158,8 @@ class DnsdbConnector(BaseConnector):
         # Getting optional input parameters
         record_type = param.get(DNSDB_JSON_TYPE, DNSDB_JSON_TYPE_DEFAULT)
         if record_type and record_type not in DNSDB_LOOKUP_TYPE_VALUE_LIST:
-            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MSG.format(DNSDB_LOOKUP_TYPE_VALUE_LIST, DNSDB_JSON_TYPE))
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MSG.format(
+                DNSDB_LOOKUP_TYPE_VALUE_LIST, DNSDB_JSON_TYPE))
 
         bailiwick = param.get(DNSDB_JSON_BAILIWICK)
         limit = param.get(DNSDB_JSON_LIMIT, 200)
@@ -418,7 +417,8 @@ class DnsdbConnector(BaseConnector):
             return action_result.get_status()
         record_type = param.get(DNSDB_JSON_TYPE, DNSDB_JSON_TYPE_DEFAULT)
         if record_type and record_type not in DNSDB_LOOKUP_TYPE_VALUE_LIST:
-            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MSG.format(DNSDB_LOOKUP_TYPE_VALUE_LIST, DNSDB_JSON_TYPE))
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MSG.format(
+                DNSDB_LOOKUP_TYPE_VALUE_LIST, DNSDB_JSON_TYPE))
 
         summary_data = action_result.update_summary({})
 
@@ -483,10 +483,12 @@ class DnsdbConnector(BaseConnector):
         query = param[DNSDB_JSON_QUERY]
         rrtype = param[DNSDB_JSON_TYPE]
         if rrtype not in DNSDB_JSON_TYPE_VALUE_LIST:
-            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MSG.format(DNSDB_JSON_TYPE_VALUE_LIST, DNSDB_JSON_TYPE))
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MSG.format(
+                DNSDB_JSON_TYPE_VALUE_LIST, DNSDB_JSON_TYPE))
         search_type = param[DNSDB_JSON_SEARCH_TYPE]
         if search_type not in DNSDB_JSON_SEARCH_TYPE_VALUE_LIST:
-            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MSG.format(DNSDB_JSON_SEARCH_TYPE_VALUE_LIST, DNSDB_JSON_SEARCH_TYPE))
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MSG.format(
+                DNSDB_JSON_SEARCH_TYPE_VALUE_LIST, DNSDB_JSON_SEARCH_TYPE))
 
         # Getting optional input parameter
         limit = param.get(DNSDB_JSON_LIMIT, 10000)
@@ -670,6 +672,7 @@ class DnsdbConnector(BaseConnector):
 
 if __name__ == '__main__':
     import sys
+
     import pudb
 
     pudb.set_trace()
