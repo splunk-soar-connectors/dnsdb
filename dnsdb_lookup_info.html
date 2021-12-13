@@ -13,11 +13,18 @@
 
 {% block widget_content %} <!-- Main Start Block -->
 
-<!-- 
-File: dnsdb_lookup_info.html
-Copyright (c) 2016-2021 Splunk Inc.
+<!-- File: dnsdb_lookup_info.html
+  Copyright (c) 2016-2021 Splunk Inc.
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software distributed under
+  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+  either express or implied. See the License for the specific language governing permissions
+  and limitations under the License.
 -->
 
 <style>
@@ -198,14 +205,14 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
           </td>
         </tr>
         {% endif %}
-        
+
         {% if result.param.network_prefix %}
         <tr>
           <td> Network prefix </td>
           <td> {{ result.param.network_prefix }} </td>
         </tr>
         {% endif %}
-        
+
         {% if result.param.time_first_before %}
         <tr>
           <td> Record first seen before </td>
@@ -233,7 +240,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
           <td> {{ result.param.time_last_after }} </td>
         </tr>
         {% endif %}
-        
+
         {% if result.param.limit %}
         <tr>
           <td> Max record to return </td>
@@ -247,9 +254,9 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
           <td> {{ result.summary.total_domains }} </td>
         </tr>
         {% endif %}
-        
+
       </table>
-      
+
       <div class="wf-table-div">
       <h3 class="wf-h3-style">RDATA Lookup</h3>
       <table id="rrname_table" class="datatable wf-table-horizontal">
@@ -259,7 +266,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
         </tr>
         </thead>
         <tbody>
-        {% for curr_domain in result.data.ip.domains %}        
+        {% for curr_domain in result.data.ip.domains %}
           <tr>
             <td>
               <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_domain }}' }], 0, {{ container.id }}, null, false);">
@@ -273,7 +280,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
         </tbody>
       </table>
       </div>
-      
+
       <div class="wf-table-div">
       <h3 class="wf-h3-style">Detailed Information</h3>
       <table id="rrname_table" class="datatable wf-table-horizontal">
@@ -286,7 +293,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
         </tr>
         </thead>
         <tbody>
-        {% for data in result.data.response %}        
+        {% for data in result.data.response %}
           <tr>
             <td>
               <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ data.rrname }}' }], 0, {{ container.id }}, null, false);">
@@ -313,7 +320,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
               {% endfor %}
             {% elif result.param.ip %}
                 <td>
-                  {% for rdata in data.rdata %} 
+                  {% for rdata in data.rdata %}
                   <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip', 'dnsdb ipv6'], 'value': '{{ rdata }}' }], 0, {{ container.id }}, null, false);">
                     {{ rdata }}
                   &nbsp;
@@ -333,7 +340,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
         </tbody>
       </table>
       </div>
-      
+
       {% elif result.param.raw_rdata %}
       <h3 class="wf-h3-style">Info</h3>
       <table class="wf-table-vertical">
@@ -347,7 +354,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
             </a>
           </td>
         </tr>
-        
+
         {% if result.param.time_first_before %}
         <tr>
           <td> Record first seen before </td>
@@ -375,7 +382,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
           <td> {{ result.param.time_last_after }} </td>
         </tr>
         {% endif %}
-        
+
         {% if result.param.limit %}
         <tr>
           <td> Max record to return </td>
@@ -389,9 +396,9 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
           <td> {{ result.summary.total_domains }} </td>
         </tr>
         {% endif %}
-        
+
       </table>
-      
+
       <div class="wf-table-div">
       <h3 class="wf-h3-style">Raw RDATA Lookup</h3>
       <table id="rrname_table" class="datatable wf-table-horizontal">
@@ -427,7 +434,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
             </tr>
             </thead>
             <tbody>
-            {% for data in result.data.response %}        
+            {% for data in result.data.response %}
               <tr>
                 <td>
                   <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ data.rrname }}' }], 0, {{ container.id }}, null, false);">
@@ -484,14 +491,14 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
             <td> ANY </td>
           {% endif %}
         </tr>
-        
+
         {% if result.param.bailiwick %}
         <tr>
           <td> Bailiwick </td>
           <td> {{ result.param.bailiwick }} </td>
         </tr>
         {% endif %}
-        
+
         {% if result.param.time_first_before %}
         <tr>
           <td> Record first seen before </td>
@@ -519,7 +526,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
           <td> {{ result.param.time_last_after }} </td>
         </tr>
         {% endif %}
-        
+
         {% if result.param.limit %}
         <tr>
           <td> Max record to return </td>
@@ -534,11 +541,11 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
         </tr>
         {% endif %}
       </table>
-      
+
       <br>
       <h3 class="wf-h3-style">RRSET Lookup</h3>
       <br>
-      
+
       <div class="container">
         <span> Type: &nbsp;</span>
         <select id="rdata_type" class="wf-table-vertical" onchange="show_table(this)">
@@ -547,7 +554,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
           {% endfor %}
         </select>
       </div>
-      
+
       {% for curr_rrtype in result.data.domain %}
         {% if curr_rrtype == 'SOA' %}
           <div class="wf-table-div" id="type_{{ curr_rrtype }}" style="{% if not forloop.first %} display:none;{% endif %} width:100%;">
@@ -582,7 +589,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
                     &nbsp;
                     <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                   </a>
-                </td>                       
+                </td>
                 <td>{{ curr_rdata.rdata_serial }}</td>
                 <td>{{ curr_rdata.rdata_refresh }}</td>
                 <td>{{ curr_rdata.rdata_retry }}</td>
@@ -615,7 +622,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
                     &nbsp;
                     <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                   </a>
-                </td>                       
+                </td>
               </tr>
               {% endfor %}
             </tbody>
@@ -688,7 +695,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
   });
   $.fn.DataTable.ext.pager.numbers_length = 5;
   $('.datatable').DataTable();
-  
+
   function show_table(e){
     var type = $(e).val();
     $('.wf-table-div').hide();
@@ -708,4 +715,3 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
   }
 </script>
 {% endblock %} <!-- Main Start Block -->
-
