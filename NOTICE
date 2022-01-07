@@ -1,12 +1,7 @@
 Splunk SOAR DNSDB
-Copyright 2021 Splunk Inc.
+Copyright (c) 2016-2021 Splunk Inc.
 
 Third-party Software Attributions:
-
-Library: pudb
-Version: 2019.2
-License: MIT
-Copyright 2009 Andreas Kloeckner and contributors
 
 Library: dnsdb2
 Version: 1.1.3
