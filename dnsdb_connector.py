@@ -683,4 +683,4 @@ if __name__ == '__main__':
         connector = DnsdbConnector()
         connector.print_progress_message = True
         connector._handle_action(json.dumps(in_json), None)
-    exit(0)
+    sys.exit(0)
