@@ -5,7 +5,7 @@
     "publisher": "Splunk",
     "package_name": "phantom_dnsdb",
     "type": "investigative",
-    "license": "Copyright (c) 2016-2021 Splunk Inc.",
+    "license": "Copyright (c) 2016-2022 Splunk Inc.",
     "main_module": "dnsdb_connector.py",
     "app_version": "2.0.4",
     "utctime_updated": "2022-01-07T21:09:29.000000Z",
@@ -22,7 +22,7 @@
         "Cloud API, v2.0, 2020-09-20"
     ],
     "product_version_regex": ".*",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "5.1.0",
     "logo": "logo_dnsdb.svg",
     "logo_dark": "logo_dnsdb_dark.svg",
     "directory": "dnsdb_adf140f0-60e3-45ff-8d69-258b3c0a63b1",
@@ -38,7 +38,7 @@
             },
             {
                 "module": "charset_normalizer",
-                "input_file": "wheels/charset_normalizer-2.0.7-py3-none-any.whl"
+                "input_file": "wheels/charset_normalizer-2.0.10-py3-none-any.whl"
             },
             {
                 "module": "dnsdb2",
@@ -50,19 +50,19 @@
             },
             {
                 "module": "importlib_metadata",
-                "input_file": "wheels/importlib_metadata-4.8.2-py3-none-any.whl"
+                "input_file": "wheels/importlib_metadata-4.8.3-py3-none-any.whl"
             },
             {
                 "module": "requests",
-                "input_file": "wheels/requests-2.26.0-py2.py3-none-any.whl"
+                "input_file": "wheels/requests-2.27.1-py2.py3-none-any.whl"
             },
             {
                 "module": "typing_extensions",
-                "input_file": "wheels/typing_extensions-3.10.0.2-py3-none-any.whl"
+                "input_file": "wheels/typing_extensions-4.0.1-py3-none-any.whl"
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/urllib3-1.26.7-py2.py3-none-any.whl"
+                "input_file": "wheels/urllib3-1.26.8-py2.py3-none-any.whl"
             },
             {
                 "module": "zipp",

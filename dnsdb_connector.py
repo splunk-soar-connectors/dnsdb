@@ -1,6 +1,6 @@
 # File: dnsdb_connector.py
 #
-# Copyright (c) 2016-2021 Splunk Inc.
+# Copyright (c) 2016-2022 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -683,4 +683,4 @@ if __name__ == '__main__':
         connector = DnsdbConnector()
         connector.print_progress_message = True
         connector._handle_action(json.dumps(in_json), None)
-    exit(0)
+    sys.exit(0)
