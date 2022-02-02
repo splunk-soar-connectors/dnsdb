@@ -1,8 +1,17 @@
 # File: dnsdb_consts.py
-# Copyright (c) 2016-2021 Splunk Inc.
 #
-# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
-
+# Copyright (c) 2016-2022 Splunk Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed under
+# the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+# either express or implied. See the License for the specific language governing permissions
+# and limitations under the License.
 DNSDB_JSON_RTYPE_IP = 'A'
 DNSDB_JSON_API_KEY = 'api_key'
 DNSDB_JSON_OWNER_NAME = 'owner_name'
@@ -78,8 +87,9 @@ DNSDB_NON_NEGATIVE_INTEGER_MSG = "Please provide a valid non-negative integer va
 DNSDB_LIMIT_KEY = "'limit' action parameter"
 DNSDB_NETWORK_PREFIX_KEY = "'network_prefix' action parameter"
 
-DNSDB_LOOKUP_TYPE_VALUE_LIST = ["ANY", "A", "A6", "AAAA", "AFSDB", "CNAME", "DNAME", "HINFO", "ISDN", "KX", "NAPTR", "NXT", "MB", "MD", "MF", "MG", "MINFO", "MR", "MX", "NS",
-    "PTR", "PX", "RP", "RT", "SIG", "SOA", "SRV", "TXT", "ANY-DNSSEC", "DLV", "DNSKEY", "DS", "NSEC", "NSEC3", "NSEC3PARAM", "RRSIG"]
+DNSDB_LOOKUP_TYPE_VALUE_LIST = ["ANY", "A", "A6", "AAAA", "AFSDB", "CNAME", "DNAME", "HINFO", "ISDN", "KX", "NAPTR", "NXT",
+"MB", "MD", "MF", "MG", "MINFO", "MR", "MX", "NS", "PTR", "PX", "RP", "RT", "SIG", "SOA", "SRV", "TXT", "ANY-DNSSEC", "DLV",
+"DNSKEY", "DS", "NSEC", "NSEC3", "NSEC3PARAM", "RRSIG"]
 DNSDB_JSON_TYPE_VALUE_LIST = ["RDATA", "RRNAMES"]
 DNSDB_JSON_SEARCH_TYPE_VALUE_LIST = ["regex", "glob"]
 DNSDB_VALUE_LIST_VALIDATION_MSG = "Please provide valid input from {} in '{}' action parameter"

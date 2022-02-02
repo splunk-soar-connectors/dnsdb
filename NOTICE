@@ -1,0 +1,9 @@
+Splunk SOAR DNSDB
+Copyright (c) 2016-2022 Splunk Inc.
+
+Third-party Software Attributions:
+
+Library: dnsdb2
+Version: 1.1.3
+License: Apache 2.0
+Copyright 2020 by Farsight Security, Inc
