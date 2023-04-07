@@ -1,6 +1,6 @@
 # File: dnsdb_connector.py
 #
-# Copyright (c) 2016-2022 Splunk Inc.
+# Copyright (c) 2016-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,25 +48,25 @@ class DnsdbConnector(BaseConnector):
             if e.args:
                 if len(e.args) > 1:
                     error_code = e.args[0]
-                    error_msg = e.args[1]
+                    error_message = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = DNSDB_ERR_CODE_MSG
-                    error_msg = e.args[0]
+                    error_code = DNSDB_ERROR_CODE_MSG
+                    error_message = e.args[0]
             else:
-                error_code = DNSDB_ERR_CODE_MSG
-                error_msg = DNSDB_ERR_MSG_UNAVAILABLE
+                error_code = DNSDB_ERROR_CODE_MSG
+                error_message = DNSDB_ERR_MSG_UNAVAILABLE
         except:
-            error_code = DNSDB_ERR_CODE_MSG
-            error_msg = DNSDB_ERR_MSG_UNAVAILABLE
+            error_code = DNSDB_ERROR_CODE_MSG
+            error_message = DNSDB_ERR_MSG_UNAVAILABLE
 
         try:
-            if error_code in DNSDB_ERR_CODE_MSG:
-                error_text = "Error Message: {0}".format(error_msg)
+            if error_code in DNSDB_ERROR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_message)
             else:
-                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_message)
         except:
-            self.debug_print(DNSDB_PARSE_ERR_MSG)
-            error_text = DNSDB_PARSE_ERR_MSG
+            self.debug_print(DNSDB_PARSE_ERROR_MESSAGE)
+            error_text = DNSDB_PARSE_ERROR_MESSAGE
 
         return error_text
 

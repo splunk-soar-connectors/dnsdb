@@ -1,6 +1,6 @@
 # File: dnsdb_consts.py
 #
-# Copyright (c) 2016-2022 Splunk Inc.
+# Copyright (c) 2016-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 DNSDB_JSON_RTYPE_IP = 'A'
-DNSDB_JSON_API_KEY = 'api_key'
+DNSDB_JSON_API_KEY = 'api_key'  # pragma: allowlist secret
 DNSDB_JSON_OWNER_NAME = 'owner_name'
 DNSDB_JSON_BAILIWICK = 'bailiwick'
 DNSDB_JSON_TYPE = 'type'
@@ -77,9 +77,9 @@ DNSDB_REST_RESP_OTHER_ERROR_MSG = 'Error occurred'
 DNSDB_DATA_NOT_AVAILABLE_MSG = 'Data not available'
 
 # Error message handling constants
-DNSDB_ERR_CODE_MSG = "Error code unavailable"
+DNSDB_ERROR_CODE_MSG = "Error code unavailable"
 DNSDB_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
-DNSDB_PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
+DNSDB_PARSE_ERROR_MESSAGE = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
 
 # Integer validation constants
 DNSDB_VALID_INTEGER_MSG = "Please provide a valid integer value in the {key}"
