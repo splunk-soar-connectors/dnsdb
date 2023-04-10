@@ -74,14 +74,14 @@ class DnsdbConnector(BaseConnector):
         if parameter is not None:
             try:
                 if not float(parameter).is_integer():
-                    return action_result.set_status(phantom.APP_ERROR, DNSDB_VALID_INTEGER_MSG.format(key=key)), None
+                    return action_result.set_status(phantom.APP_ERROR, DNSDB_VALID_INTEGER_MESSAGE.format(key=key)), None
 
                 parameter = int(parameter)
             except:
-                return action_result.set_status(phantom.APP_ERROR, DNSDB_VALID_INTEGER_MSG.format(key=key)), None
+                return action_result.set_status(phantom.APP_ERROR, DNSDB_VALID_INTEGER_MESSAGE.format(key=key)), None
 
             if parameter < 0:
-                return action_result.set_status(phantom.APP_ERROR, DNSDB_NON_NEGATIVE_INTEGER_MSG.format(key=key)), None
+                return action_result.set_status(phantom.APP_ERROR, DNSDB_NON_NEGATIVE_INTEGER_MESSAGE.format(key=key)), None
 
         return phantom.APP_SUCCESS, parameter
 
@@ -124,11 +124,11 @@ class DnsdbConnector(BaseConnector):
             rate = self._client.rate_limit()[DNSDB_JSON_RATE]
         except dnsdb2.exceptions.AccessDenied:
             return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MSG)
+                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MESSAGE)
 
         except dnsdb2.exceptions.QuotaExceeded:
             return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
+                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MESSAGE)
 
         except Exception as e:
             self.debug_print(self._get_error_message_from_exception(e))
@@ -138,6 +138,11 @@ class DnsdbConnector(BaseConnector):
 
         action_result.add_data(rate)
         return action_result.set_status(phantom.APP_SUCCESS, "Rate limit details fetched successfully")
+
+    def _check_rate_limit(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.debug_print("Calling test connectivity for checking rate limit")
+        return self._test_connectivity(param)
 
     def _is_ipv6(self, address):
 
@@ -158,7 +163,7 @@ class DnsdbConnector(BaseConnector):
         # Getting optional input parameters
         record_type = param.get(DNSDB_JSON_TYPE, DNSDB_JSON_TYPE_DEFAULT)
         if record_type and record_type not in DNSDB_LOOKUP_TYPE_VALUE_LIST:
-            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MSG.format(
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(
                 DNSDB_LOOKUP_TYPE_VALUE_LIST, DNSDB_JSON_TYPE))
 
         bailiwick = param.get(DNSDB_JSON_BAILIWICK)
@@ -190,10 +195,10 @@ class DnsdbConnector(BaseConnector):
                                                     ignore_limited=True))
         except dnsdb2.exceptions.AccessDenied:
             return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MSG)
+                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MESSAGE)
         except dnsdb2.exceptions.QuotaExceeded:
             return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
+                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MESSAGE)
         except UnicodeError:
             return action_result.set_status(phantom.APP_ERROR,
                     DNSDB_ERROR_INVALID_BAILIWICK % (bailiwick))
@@ -305,10 +310,10 @@ class DnsdbConnector(BaseConnector):
                                                         ignore_limited=True))
         except dnsdb2.exceptions.AccessDenied:
             return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MSG)
+                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MESSAGE)
         except dnsdb2.exceptions.QuotaExceeded:
             return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
+                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MESSAGE)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, err)
@@ -371,10 +376,10 @@ class DnsdbConnector(BaseConnector):
                                                         ignore_limited=True))
         except dnsdb2.exceptions.AccessDenied:
             return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MSG)
+                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MESSAGE)
         except dnsdb2.exceptions.QuotaExceeded:
             return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
+                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MESSAGE)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, err)
@@ -417,7 +422,7 @@ class DnsdbConnector(BaseConnector):
             return action_result.get_status()
         record_type = param.get(DNSDB_JSON_TYPE, DNSDB_JSON_TYPE_DEFAULT)
         if record_type and record_type not in DNSDB_LOOKUP_TYPE_VALUE_LIST:
-            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MSG.format(
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(
                 DNSDB_LOOKUP_TYPE_VALUE_LIST, DNSDB_JSON_TYPE))
 
         summary_data = action_result.update_summary({})
@@ -442,10 +447,10 @@ class DnsdbConnector(BaseConnector):
                                                         ignore_limited=True))
         except dnsdb2.exceptions.AccessDenied:
             return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MSG)
+                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MESSAGE)
         except dnsdb2.exceptions.QuotaExceeded:
             return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
+                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MESSAGE)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             ret_val = action_result.set_status(phantom.APP_ERROR, err)
@@ -483,11 +488,11 @@ class DnsdbConnector(BaseConnector):
         query = param[DNSDB_JSON_QUERY]
         rrtype = param[DNSDB_JSON_TYPE]
         if rrtype not in DNSDB_JSON_TYPE_VALUE_LIST:
-            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MSG.format(
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(
                 DNSDB_JSON_TYPE_VALUE_LIST, DNSDB_JSON_TYPE))
         search_type = param[DNSDB_JSON_SEARCH_TYPE]
         if search_type not in DNSDB_JSON_SEARCH_TYPE_VALUE_LIST:
-            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MSG.format(
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(
                 DNSDB_JSON_SEARCH_TYPE_VALUE_LIST, DNSDB_JSON_SEARCH_TYPE))
 
         # Getting optional input parameter
@@ -547,10 +552,10 @@ class DnsdbConnector(BaseConnector):
                                                         ignore_limited=True))
         except dnsdb2.exceptions.AccessDenied:
             return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MSG)
+                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MESSAGE)
         except dnsdb2.exceptions.QuotaExceeded:
             return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
+                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MESSAGE)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, err)
@@ -652,7 +657,7 @@ class DnsdbConnector(BaseConnector):
         # Supported actions by app
         supported_actions = {
             'test_asset_connectivity': self._test_connectivity,
-            'check_rate_limit': self._test_connectivity,
+            'check_rate_limit': self._check_rate_limit,
             'lookup_rdata_ip': self._lookup_rdata_ip,
             'lookup_rdata_name': self._lookup_rdata_name,
             'lookup_rdata_raw': self._lookup_rdata_raw,

@@ -55,16 +55,16 @@ DNSDB_TEST_CONNECTIVITY_SUCCESS = 'Connectivity test succeeded'
 DNSDB_TEST_CONNECTIVITY_MESSAGE = 'Running a rate-limit query to check API key with DNSDB'
 DNSDB_TEST_CONNECTIVITY_SUCCESS_MESSAGE = "Test succeeded. Query quota is %s with %s queries remaining. Resets %s"
 DNSDB_REST_RESP_SUCCESS = 200
-DNSDB_REST_RESP_SUCCESS_MSG = 'Request Successful'
+DNSDB_REST_RESP_SUCCESS_MESSAGE = 'Request Successful'
 DNSDB_REST_RESP_RESOURCE_INCORRECT = 400
-DNSDB_REST_RESP_RESOURCE_INCORRECT_MSG = 'Invalid input. The resource is in '\
+DNSDB_REST_RESP_RESOURCE_INCORRECT_MESSAGE = 'Invalid input. The resource is in '\
                                          'an incorrect format'
 DNSDB_REST_RESP_ACCESS_DENIED = 403
-DNSDB_REST_RESP_ACCESS_DENIED_MSG = 'The API key is invalid'
+DNSDB_REST_RESP_ACCESS_DENIED_MESSAGE = 'The API key is invalid'
 DNSDB_REST_RESP_RESOURCE_NOT_FOUND = 404
-DNSDB_REST_RESP_RESOURCE_NOT_FOUND_MSG = 'Resource not found'
+DNSDB_REST_RESP_RESOURCE_NOT_FOUND_MESSAGE = 'Resource not found'
 DNSDB_REST_RESP_LIC_EXCEED = 429
-DNSDB_REST_RESP_LIC_EXCEED_MSG = 'The license count usage for the given '\
+DNSDB_REST_RESP_LIC_EXCEED_MESSAGE = 'The license count usage for the given '\
                                  'period has been exceeded.'
 DNSDB_REST_RESP_OVERLOADED = 503
 DNSDB_REST_RESP_OVERLOADED_MESSAGE = 'Server is overloaded. Retry your call '\
@@ -82,8 +82,8 @@ DNSDB_ERROR_MESSAGE_UNAVAILABLE = "Error message unavailable. Please check the a
 DNSDB_PARSE_ERROR_MESSAGE = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
 
 # Integer validation constants
-DNSDB_VALID_INTEGER_MSG = "Please provide a valid integer value in the {key}"
-DNSDB_NON_NEGATIVE_INTEGER_MSG = "Please provide a valid non-negative integer value in the {key}"
+DNSDB_VALID_INTEGER_MESSAGE = "Please provide a valid integer value in the {key}"
+DNSDB_NON_NEGATIVE_INTEGER_MESSAGE = "Please provide a valid non-negative integer value in the {key}"
 DNSDB_LIMIT_KEY = "'limit' action parameter"
 DNSDB_NETWORK_PREFIX_KEY = "'network_prefix' action parameter"
 
@@ -92,4 +92,4 @@ DNSDB_LOOKUP_TYPE_VALUE_LIST = ["ANY", "A", "A6", "AAAA", "AFSDB", "CNAME", "DNA
 "DNSKEY", "DS", "NSEC", "NSEC3", "NSEC3PARAM", "RRSIG"]
 DNSDB_JSON_TYPE_VALUE_LIST = ["RDATA", "RRNAMES"]
 DNSDB_JSON_SEARCH_TYPE_VALUE_LIST = ["regex", "glob"]
-DNSDB_VALUE_LIST_VALIDATION_MSG = "Please provide valid input from {} in '{}' action parameter"
+DNSDB_VALUE_LIST_VALIDATION_MESSAGE = "Please provide valid input from {} in '{}' action parameter"
