@@ -42,18 +42,18 @@ DNSDB_ENDPOINT_DOMAIN_TYPE = '/rrset/name/{domain}/{type}'
 DNSDB_ENDPOINT_DOMAIN_TYPE_ZONE = '/rrset/name/{domain}/{type}/{zone}'
 DNSDB_ENDPOINT_IP = '/rdata/ip/{ip}'
 DNSDB_ENDPOINT_IP_PREFIX = '/rdata/ip/{ip},{prefix}'
-DNSDB_ERR_API_UNSUPPORTED_METHOD = 'Unsupported method : {method}'
-DNSDB_ERR_INVALID_TIME_FORMAT = 'Invalid time format : {time}'
-DNSDB_ERR_INVALID_TIME = "Future date value is not allowed. Please provide valid datetime"
-DNSDB_ERR_INVALID_LIMIT = 'Invalid response length limit : {limit}'
-DNSDB_ERR_INVALID_NETWORK_PREFIX = 'Invalid network prefix : {prefix}'
-DNSDB_ERR_INVALID_BAILIWICK = 'Invalid bailiwick : %s'
-DNSDB_TEST_CONN_INITIATION = 'Testing connectivity'
-DNSDB_TEST_CONN_DOMAIN = 'www.phantomcyber.com'
-DNSDB_TEST_CONN_FAIL = 'Connectivity test failed'
-DNSDB_TEST_CONN_SUCC = 'Connectivity test succeeded'
-DNSDB_TEST_CONNECTIVITY_MSG = 'Running a rate-limit query to check API key with DNSDB'
-DNSDB_TEST_CONNECTIVITY_SUCCESS_MSG = "Test succeeded. Query quota is %s with %s queries remaining. Resets %s"
+DNSDB_ERROR_API_UNSUPPORTED_METHOD = 'Unsupported method : {method}'
+DNSDB_ERROR_INVALID_TIME_FORMAT = 'Invalid time format : {time}'
+DNSDB_ERROR_INVALID_TIME = "Future date value is not allowed. Please provide valid datetime"
+DNSDB_ERROR_INVALID_LIMIT = 'Invalid response length limit : {limit}'
+DNSDB_ERROR_INVALID_NETWORK_PREFIX = 'Invalid network prefix : {prefix}'
+DNSDB_ERROR_INVALID_BAILIWICK = 'Invalid bailiwick : %s'
+DNSDB_TEST_CONNECTIVITY_INITIATION = 'Testing connectivity'
+DNSDB_TEST_CONNECTIVITY_DOMAIN = 'www.phantomcyber.com'
+DNSDB_TEST_CONNECTIVITY_FAIL = 'Connectivity test failed'
+DNSDB_TEST_CONNECTIVITY_SUCCESS = 'Connectivity test succeeded'
+DNSDB_TEST_CONNECTIVITY_MESSAGE = 'Running a rate-limit query to check API key with DNSDB'
+DNSDB_TEST_CONNECTIVITY_SUCCESS_MESSAGE = "Test succeeded. Query quota is %s with %s queries remaining. Resets %s"
 DNSDB_REST_RESP_SUCCESS = 200
 DNSDB_REST_RESP_SUCCESS_MSG = 'Request Successful'
 DNSDB_REST_RESP_RESOURCE_INCORRECT = 400
@@ -67,18 +67,18 @@ DNSDB_REST_RESP_LIC_EXCEED = 429
 DNSDB_REST_RESP_LIC_EXCEED_MSG = 'The license count usage for the given '\
                                  'period has been exceeded.'
 DNSDB_REST_RESP_OVERLOADED = 503
-DNSDB_REST_RESP_OVERLOADED_MSG = 'Server is overloaded. Retry your call '\
+DNSDB_REST_RESP_OVERLOADED_MESSAGE = 'Server is overloaded. Retry your call '\
                                  'after the time period displayed.'
-DNSDB_ERR_JSON_PARSE = 'Unable to parse the fields parameter into a '\
+DNSDB_ERROR_JSON_PARSE = 'Unable to parse the fields parameter into a '\
                        'dictionary. , Response text - {raw_text}'
-DNSDB_ERR_FROM_SERVER = 'API failed, Status code: {status}, Detail: {detail}'
-DNSDB_ERR_SERVER_CONNECTION = 'Connection failed'
-DNSDB_REST_RESP_OTHER_ERROR_MSG = 'Error occurred'
-DNSDB_DATA_NOT_AVAILABLE_MSG = 'Data not available'
+DNSDB_ERROR_FROM_SERVER = 'API failed, Status code: {status}, Detail: {detail}'
+DNSDB_ERROR_SERVER_CONNECTION = 'Connection failed'
+DNSDB_REST_RESP_OTHER_ERROR_MESSAGE = 'Error occurred'
+DNSDB_DATA_NOT_AVAILABLE_MESSAGE = 'Data not available'
 
 # Error message handling constants
-DNSDB_ERROR_CODE_MSG = "Error code unavailable"
-DNSDB_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
+DNSDB_ERROR_CODE_MESSAGE = "Error code unavailable"
+DNSDB_ERROR_MESSAGE_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
 DNSDB_PARSE_ERROR_MESSAGE = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
 
 # Integer validation constants
