@@ -24,11 +24,6 @@ This app supports investigative DNS lookup actions on DNSDB
 [comment]: # "either express or implied. See the License for the specific language governing permissions"
 [comment]: # "and limitations under the License."
 [comment]: # ""
-[comment]: # " File: README.md"
-[comment]: # "  Copyright (c) 2016-2022 Splunk Inc."
-[comment]: # ""
-[comment]: # "Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)"
-[comment]: # ""
 ## Description of Action Parameters
 
 1.  ### Test Connectivity (Action Workflow)
