@@ -1,2 +1,2 @@
 **Unreleased**
-* Updated the dependencies and restructured the wheels folder [PAPP-30038]
+* Updated the dependencies and restructured the wheels folder
