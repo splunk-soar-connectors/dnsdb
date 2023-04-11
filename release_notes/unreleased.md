@@ -1,2 +1,2 @@
 **Unreleased**
-* Updated the dependencies and restructured the wheels folder
+* Made the app compatible with Splunk SOAR version 6.0.1[Persona] by updating the dependencies and restructuring the wheels folder [PAPP-30038]
