@@ -2,7 +2,7 @@
 # DNSDB
 
 Publisher: Splunk  
-Connector Version: 2.1.0  
+Connector Version: 2.1.1  
 Product Vendor: Farsight Security, Inc.  
 Product Name: DNSDB  
 Product Version Supported (regex): ".\*"  
