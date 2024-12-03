@@ -39,7 +39,7 @@ class DnsdbConnector(BaseConnector):
         return
 
     def _get_error_message_from_exception(self, e):
-        """ This method is used to get appropriate error message from the exception.
+        """This method is used to get appropriate error message from the exception.
         :param e: Exception object
         :return: error message
         """
@@ -93,16 +93,16 @@ class DnsdbConnector(BaseConnector):
             return False
         if phantom.is_ip(param):
             return False
-        if param[-1] == '.':
+        if param[-1] == ".":
             param = param[:-1]
         allowed = re.compile(r"(?!-)[A-Z\\d\-_]{1,63}(?<!-')$", re.IGNORECASE)
-        parts = param.split('.')
+        parts = param.split(".")
 
         # Wildcard search '*' is allowed in the first and
         # last subdomain only
         for idx, x in enumerate(parts):
             if idx == 0 or idx == (len(parts) - 1):
-                if not (x == '*' or allowed.match(x)):
+                if not (x == "*" or allowed.match(x)):
                     return False
             elif not allowed.match(x):
                 return False
@@ -112,7 +112,7 @@ class DnsdbConnector(BaseConnector):
         config = self.get_config()
         self._api_key = config[DNSDB_JSON_API_KEY]
         self._client = dnsdb2.Client(config[DNSDB_JSON_API_KEY])
-        self.set_validator('domain', self._validate_domain)
+        self.set_validator("domain", self._validate_domain)
         return phantom.APP_SUCCESS
 
     def _test_connectivity(self, param):
@@ -123,18 +123,15 @@ class DnsdbConnector(BaseConnector):
         try:
             rate = self._client.rate_limit()[DNSDB_JSON_RATE]
         except dnsdb2.exceptions.AccessDenied:
-            return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MESSAGE)
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MESSAGE)
 
         except dnsdb2.exceptions.QuotaExceeded:
-            return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MESSAGE)
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MESSAGE)
 
         except Exception as e:
             self.debug_print(self._get_error_message_from_exception(e))
-            return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_TEST_CONNECTIVITY_FAIL)
-        self.save_progress(DNSDB_TEST_CONNECTIVITY_SUCCESS_MESSAGE % (rate.get('limit'), rate.get('remaining'), rate.get('reset')))
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_TEST_CONNECTIVITY_FAIL)
+        self.save_progress(DNSDB_TEST_CONNECTIVITY_SUCCESS_MESSAGE % (rate.get("limit"), rate.get("remaining"), rate.get("reset")))
 
         action_result.add_data(rate)
         return action_result.set_status(phantom.APP_SUCCESS, "Rate limit details fetched successfully")
@@ -163,8 +160,9 @@ class DnsdbConnector(BaseConnector):
         # Getting optional input parameters
         record_type = param.get(DNSDB_JSON_TYPE, DNSDB_JSON_TYPE_DEFAULT)
         if record_type and record_type not in DNSDB_LOOKUP_TYPE_VALUE_LIST:
-            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(
-                DNSDB_LOOKUP_TYPE_VALUE_LIST, DNSDB_JSON_TYPE))
+            return action_result.set_status(
+                phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(DNSDB_LOOKUP_TYPE_VALUE_LIST, DNSDB_JSON_TYPE)
+            )
 
         bailiwick = param.get(DNSDB_JSON_BAILIWICK)
         limit = param.get(DNSDB_JSON_LIMIT, 200)
@@ -184,24 +182,25 @@ class DnsdbConnector(BaseConnector):
             return action_result.get_status()
 
         try:
-            responses = list(self._client.lookup_rrset(owner_name,
-                                                    bailiwick=bailiwick,
-                                                    rrtype=record_type,
-                                                    limit=limit,
-                                                    time_first_before=timestamps[0],
-                                                    time_first_after=timestamps[1],
-                                                    time_last_before=timestamps[2],
-                                                    time_last_after=timestamps[3],
-                                                    ignore_limited=True))
+            responses = list(
+                self._client.lookup_rrset(
+                    owner_name,
+                    bailiwick=bailiwick,
+                    rrtype=record_type,
+                    limit=limit,
+                    time_first_before=timestamps[0],
+                    time_first_after=timestamps[1],
+                    time_last_before=timestamps[2],
+                    time_last_after=timestamps[3],
+                    ignore_limited=True,
+                )
+            )
         except dnsdb2.exceptions.AccessDenied:
-            return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MESSAGE)
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MESSAGE)
         except dnsdb2.exceptions.QuotaExceeded:
-            return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MESSAGE)
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MESSAGE)
         except UnicodeError:
-            return action_result.set_status(phantom.APP_ERROR,
-                    DNSDB_ERROR_INVALID_BAILIWICK % (bailiwick))
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_ERROR_INVALID_BAILIWICK % (bailiwick))
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, err)
@@ -211,46 +210,51 @@ class DnsdbConnector(BaseConnector):
             return action_result.set_status(phantom.APP_SUCCESS, DNSDB_DATA_NOT_AVAILABLE_MESSAGE)
 
         for resp in responses:
-            rdata = resp.get('rdata', [])
+            rdata = resp.get("rdata", [])
 
             for i, curr_rdata in enumerate(rdata):
 
                 # if type is SOA, split the data and strip it, even if . is not present, this
                 # will still execute without an error
-                if resp.get('rrtype') == 'SOA':
-                    temp_res = curr_rdata.split(' ')
-                    temp_res = [x.rstrip('.') for x in temp_res]
-                    temp_header = ['rdata_origin', 'rdata_mail_addr',
-                                   'rdata_serial', 'rdata_refresh',
-                                   'rdata_retry', 'rdata_expire',
-                                   'rdata_minimum']
+                if resp.get("rrtype") == "SOA":
+                    temp_res = curr_rdata.split(" ")
+                    temp_res = [x.rstrip(".") for x in temp_res]
+                    temp_header = [
+                        "rdata_origin",
+                        "rdata_mail_addr",
+                        "rdata_serial",
+                        "rdata_refresh",
+                        "rdata_retry",
+                        "rdata_expire",
+                        "rdata_minimum",
+                    ]
                     rdata[i] = dict(zip(temp_header, temp_res))
 
                 # if type is MX, split the data and strip it, even if . is not present, this
                 # will still execute without an error
-                elif resp.get('rrtype') == 'MX':
-                    temp_res = curr_rdata.split(' ')
-                    temp_res = [x.rstrip('.') for x in temp_res]
-                    temp_header = ['rdata_preference', 'rdata_mail_exchange']
+                elif resp.get("rrtype") == "MX":
+                    temp_res = curr_rdata.split(" ")
+                    temp_res = [x.rstrip(".") for x in temp_res]
+                    temp_header = ["rdata_preference", "rdata_mail_exchange"]
                     rdata[i] = dict(zip(temp_header, temp_res))
 
                 # for other types, first strip it, even if . is not present, this
                 # will still execute without an error
                 else:
-                    curr_rdata = curr_rdata.rstrip('.')
+                    curr_rdata = curr_rdata.rstrip(".")
                     rdata[i] = curr_rdata
 
-            if 'rrname' in resp:
-                resp['rrname'] = resp['rrname'].rstrip('.')
+            if "rrname" in resp:
+                resp["rrname"] = resp["rrname"].rstrip(".")
 
-            if 'bailiwick' in resp:
-                resp['bailiwick'] = resp['bailiwick'].rstrip('.')
+            if "bailiwick" in resp:
+                resp["bailiwick"] = resp["bailiwick"].rstrip(".")
 
             # Response from the API is list of rrset.
             # Adding Each data of list to action_result
             action_result.add_data(resp)
 
-        summary_data['total_items'] = len(responses)
+        summary_data["total_items"] = len(responses)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -283,9 +287,7 @@ class DnsdbConnector(BaseConnector):
 
             if not net_prefix_valid:
                 self.debug_print(DNSDB_ERROR_INVALID_NETWORK_PREFIX.format(prefix=network_prefix))
-                return action_result.set_status(
-                    phantom.APP_ERROR,
-                    DNSDB_ERROR_INVALID_NETWORK_PREFIX.format(prefix=network_prefix))
+                return action_result.set_status(phantom.APP_ERROR, DNSDB_ERROR_INVALID_NETWORK_PREFIX.format(prefix=network_prefix))
 
         # Endpoint as per parameter given
         if network_prefix is not None:
@@ -301,19 +303,21 @@ class DnsdbConnector(BaseConnector):
             return action_result.get_status()
 
         try:
-            responses = list(self._client.lookup_rdata_ip(ip,
-                                                        limit=limit,
-                                                        time_first_before=timestamps[0],
-                                                        time_first_after=timestamps[1],
-                                                        time_last_before=timestamps[2],
-                                                        time_last_after=timestamps[3],
-                                                        ignore_limited=True))
+            responses = list(
+                self._client.lookup_rdata_ip(
+                    ip,
+                    limit=limit,
+                    time_first_before=timestamps[0],
+                    time_first_after=timestamps[1],
+                    time_last_before=timestamps[2],
+                    time_last_after=timestamps[3],
+                    ignore_limited=True,
+                )
+            )
         except dnsdb2.exceptions.AccessDenied:
-            return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MESSAGE)
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MESSAGE)
         except dnsdb2.exceptions.QuotaExceeded:
-            return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MESSAGE)
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MESSAGE)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, err)
@@ -331,15 +335,15 @@ class DnsdbConnector(BaseConnector):
 
         for resp in responses:
 
-            if 'rrname' in resp:
-                resp['rrname'] = resp['rrname'].rstrip('.')
-                count_domain.add(resp['rrname'])
+            if "rrname" in resp:
+                resp["rrname"] = resp["rrname"].rstrip(".")
+                count_domain.add(resp["rrname"])
 
             # Response from the API is list of rdata.
             # Adding Each data of list to action_result
             action_result.add_data(resp)
 
-        summary_data['total_domains'] = len(count_domain)
+        summary_data["total_domains"] = len(count_domain)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -367,19 +371,21 @@ class DnsdbConnector(BaseConnector):
             return action_result.get_status()
 
         try:
-            responses = list(self._client.lookup_rdata_name(name,
-                                                        limit=limit,
-                                                        time_first_before=timestamps[0],
-                                                        time_first_after=timestamps[1],
-                                                        time_last_before=timestamps[2],
-                                                        time_last_after=timestamps[3],
-                                                        ignore_limited=True))
+            responses = list(
+                self._client.lookup_rdata_name(
+                    name,
+                    limit=limit,
+                    time_first_before=timestamps[0],
+                    time_first_after=timestamps[1],
+                    time_last_before=timestamps[2],
+                    time_last_after=timestamps[3],
+                    ignore_limited=True,
+                )
+            )
         except dnsdb2.exceptions.AccessDenied:
-            return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MESSAGE)
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MESSAGE)
         except dnsdb2.exceptions.QuotaExceeded:
-            return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MESSAGE)
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MESSAGE)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, err)
@@ -397,15 +403,15 @@ class DnsdbConnector(BaseConnector):
 
         for resp in responses:
 
-            if 'rrname' in resp:
-                resp['rrname'] = resp['rrname'].rstrip('.')
-                count_domain.add(resp['rrname'])
+            if "rrname" in resp:
+                resp["rrname"] = resp["rrname"].rstrip(".")
+                count_domain.add(resp["rrname"])
 
             # Response from the API is list of rdata.
             # Adding Each data of list to action_result
             action_result.add_data(resp)
 
-        summary_data['total_domains'] = len(count_domain)
+        summary_data["total_domains"] = len(count_domain)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -422,8 +428,9 @@ class DnsdbConnector(BaseConnector):
             return action_result.get_status()
         record_type = param.get(DNSDB_JSON_TYPE, DNSDB_JSON_TYPE_DEFAULT)
         if record_type and record_type not in DNSDB_LOOKUP_TYPE_VALUE_LIST:
-            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(
-                DNSDB_LOOKUP_TYPE_VALUE_LIST, DNSDB_JSON_TYPE))
+            return action_result.set_status(
+                phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(DNSDB_LOOKUP_TYPE_VALUE_LIST, DNSDB_JSON_TYPE)
+            )
 
         summary_data = action_result.update_summary({})
 
@@ -437,20 +444,22 @@ class DnsdbConnector(BaseConnector):
             return action_result.get_status()
 
         try:
-            responses = list(self._client.lookup_rdata_raw(raw_rdata,
-                                                        rrtype=record_type,
-                                                        limit=limit,
-                                                        time_first_before=timestamps[0],
-                                                        time_first_after=timestamps[1],
-                                                        time_last_before=timestamps[2],
-                                                        time_last_after=timestamps[3],
-                                                        ignore_limited=True))
+            responses = list(
+                self._client.lookup_rdata_raw(
+                    raw_rdata,
+                    rrtype=record_type,
+                    limit=limit,
+                    time_first_before=timestamps[0],
+                    time_first_after=timestamps[1],
+                    time_last_before=timestamps[2],
+                    time_last_after=timestamps[3],
+                    ignore_limited=True,
+                )
+            )
         except dnsdb2.exceptions.AccessDenied:
-            return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MESSAGE)
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MESSAGE)
         except dnsdb2.exceptions.QuotaExceeded:
-            return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MESSAGE)
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MESSAGE)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             ret_val = action_result.set_status(phantom.APP_ERROR, err)
@@ -469,14 +478,14 @@ class DnsdbConnector(BaseConnector):
         for resp in responses:
 
             if DNSDB_JSON_RRNAME in resp:
-                resp[DNSDB_JSON_RRNAME] = resp[DNSDB_JSON_RRNAME].rstrip('.')
+                resp[DNSDB_JSON_RRNAME] = resp[DNSDB_JSON_RRNAME].rstrip(".")
                 count_domain.add(resp[DNSDB_JSON_RRNAME])
 
             # Response from the API is list of rdata.
             # Adding Each data of list to action_result
             action_result.add_data(resp)
 
-        summary_data['total_domains'] = len(count_domain)
+        summary_data["total_domains"] = len(count_domain)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -488,12 +497,14 @@ class DnsdbConnector(BaseConnector):
         query = param[DNSDB_JSON_QUERY]
         rrtype = param[DNSDB_JSON_TYPE]
         if rrtype not in DNSDB_JSON_TYPE_VALUE_LIST:
-            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(
-                DNSDB_JSON_TYPE_VALUE_LIST, DNSDB_JSON_TYPE))
+            return action_result.set_status(
+                phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(DNSDB_JSON_TYPE_VALUE_LIST, DNSDB_JSON_TYPE)
+            )
         search_type = param[DNSDB_JSON_SEARCH_TYPE]
         if search_type not in DNSDB_JSON_SEARCH_TYPE_VALUE_LIST:
-            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(
-                DNSDB_JSON_SEARCH_TYPE_VALUE_LIST, DNSDB_JSON_SEARCH_TYPE))
+            return action_result.set_status(
+                phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(DNSDB_JSON_SEARCH_TYPE_VALUE_LIST, DNSDB_JSON_SEARCH_TYPE)
+            )
 
         # Getting optional input parameter
         limit = param.get(DNSDB_JSON_LIMIT, 10000)
@@ -515,47 +526,61 @@ class DnsdbConnector(BaseConnector):
             return action_result.get_status()
         try:
             if rrtype == "RDATA" and search_type == "regex":
-                responses = list(self._client.flex_rdata_regex(query,
-                                                        time_first_before=timestamps[0],
-                                                        time_first_after=timestamps[1],
-                                                        time_last_before=timestamps[2],
-                                                        time_last_after=timestamps[3],
-                                                        exclude=exclude,
-                                                        limit=limit,
-                                                        ignore_limited=True))
+                responses = list(
+                    self._client.flex_rdata_regex(
+                        query,
+                        time_first_before=timestamps[0],
+                        time_first_after=timestamps[1],
+                        time_last_before=timestamps[2],
+                        time_last_after=timestamps[3],
+                        exclude=exclude,
+                        limit=limit,
+                        ignore_limited=True,
+                    )
+                )
             elif rrtype == "RDATA" and search_type == "glob":
-                responses = list(self._client.flex_rdata_glob(query,
-                                                        time_first_before=timestamps[0],
-                                                        time_first_after=timestamps[1],
-                                                        time_last_before=timestamps[2],
-                                                        time_last_after=timestamps[3],
-                                                        exclude=exclude,
-                                                        limit=limit,
-                                                        ignore_limited=True))
+                responses = list(
+                    self._client.flex_rdata_glob(
+                        query,
+                        time_first_before=timestamps[0],
+                        time_first_after=timestamps[1],
+                        time_last_before=timestamps[2],
+                        time_last_after=timestamps[3],
+                        exclude=exclude,
+                        limit=limit,
+                        ignore_limited=True,
+                    )
+                )
             elif rrtype == "RRNAMES" and search_type == "regex":
-                responses = list(self._client.flex_rrnames_regex(query,
-                                                        time_first_before=timestamps[0],
-                                                        time_first_after=timestamps[1],
-                                                        time_last_before=timestamps[2],
-                                                        time_last_after=timestamps[3],
-                                                        exclude=exclude,
-                                                        limit=limit,
-                                                        ignore_limited=True))
+                responses = list(
+                    self._client.flex_rrnames_regex(
+                        query,
+                        time_first_before=timestamps[0],
+                        time_first_after=timestamps[1],
+                        time_last_before=timestamps[2],
+                        time_last_after=timestamps[3],
+                        exclude=exclude,
+                        limit=limit,
+                        ignore_limited=True,
+                    )
+                )
             elif rrtype == "RRNAMES" and search_type == "glob":
-                responses = list(self._client.flex_rrnames_glob(query,
-                                                        time_first_before=timestamps[0],
-                                                        time_first_after=timestamps[1],
-                                                        time_last_before=timestamps[2],
-                                                        time_last_after=timestamps[3],
-                                                        exclude=exclude,
-                                                        limit=limit,
-                                                        ignore_limited=True))
+                responses = list(
+                    self._client.flex_rrnames_glob(
+                        query,
+                        time_first_before=timestamps[0],
+                        time_first_after=timestamps[1],
+                        time_last_before=timestamps[2],
+                        time_last_after=timestamps[3],
+                        exclude=exclude,
+                        limit=limit,
+                        ignore_limited=True,
+                    )
+                )
         except dnsdb2.exceptions.AccessDenied:
-            return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MESSAGE)
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MESSAGE)
         except dnsdb2.exceptions.QuotaExceeded:
-            return action_result.set_status(
-                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MESSAGE)
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MESSAGE)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, err)
@@ -569,20 +594,20 @@ class DnsdbConnector(BaseConnector):
 
         for resp in responses:
             if DNSDB_JSON_RRNAME in resp:
-                resp[DNSDB_JSON_RRNAME] = resp[DNSDB_JSON_RRNAME].rstrip('.')
+                resp[DNSDB_JSON_RRNAME] = resp[DNSDB_JSON_RRNAME].rstrip(".")
                 count_domain.add(resp[DNSDB_JSON_RRNAME])
 
             # Response from the API is list of rdata.
             # Adding Each data of list to action_result
             action_result.add_data(resp)
 
-        summary_data['total_items'] = len(responses)
+        summary_data["total_items"] = len(responses)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _validate_params(self, param, action_result):
-        """ Function to validate input parameters and return error in case of
-            validation fails
+        """Function to validate input parameters and return error in case of
+        validation fails
         """
 
         # Getting optional input parameter
@@ -595,26 +620,22 @@ class DnsdbConnector(BaseConnector):
         if time_first_before:
             # Validating the input for time format(epoch or relative seconds)
             if not self._is_valid_time(time_first_before):
-                return action_result.set_status(phantom.APP_ERROR,
-                                                    DNSDB_ERROR_INVALID_TIME_FORMAT.format(time=time_first_before)), None
+                return action_result.set_status(phantom.APP_ERROR, DNSDB_ERROR_INVALID_TIME_FORMAT.format(time=time_first_before)), None
 
         if time_first_after:
             # Validating the input for time format(epoch or relative seconds)
             if not self._is_valid_time(time_first_after):
-                return action_result.set_status(phantom.APP_ERROR,
-                                                    DNSDB_ERROR_INVALID_TIME_FORMAT.format(time=time_first_after)), None
+                return action_result.set_status(phantom.APP_ERROR, DNSDB_ERROR_INVALID_TIME_FORMAT.format(time=time_first_after)), None
 
         if time_last_before:
             # Validating the input for time format(epoch or relative seconds)
             if not self._is_valid_time(time_last_before):
-                return action_result.set_status(phantom.APP_ERROR,
-                                                    DNSDB_ERROR_INVALID_TIME_FORMAT.format(time=time_last_before)), None
+                return action_result.set_status(phantom.APP_ERROR, DNSDB_ERROR_INVALID_TIME_FORMAT.format(time=time_last_before)), None
 
         if time_last_after:
             # Validating the input for time format(epoch or relative seconds)
             if not self._is_valid_time(time_last_after):
-                return action_result.set_status(phantom.APP_ERROR,
-                                                    DNSDB_ERROR_INVALID_TIME_FORMAT.format(time=time_last_after)), None
+                return action_result.set_status(phantom.APP_ERROR, DNSDB_ERROR_INVALID_TIME_FORMAT.format(time=time_last_after)), None
 
         for i in timestamps:
             try:
@@ -630,9 +651,9 @@ class DnsdbConnector(BaseConnector):
         return phantom.APP_SUCCESS, timestamps
 
     def _is_valid_time(self, time_value):
-        """ Function that validates given time,
-            time can be epoch time, relative seconds, or timestamp
-            e.g.1380139330, -31536000, or 2021-01-05T12:06:02Z
+        """Function that validates given time,
+        time can be epoch time, relative seconds, or timestamp
+        e.g.1380139330, -31536000, or 2021-01-05T12:06:02Z
         """
         date_format = DNSDB_TIME_FORMAT
         try:
@@ -656,13 +677,13 @@ class DnsdbConnector(BaseConnector):
 
         # Supported actions by app
         supported_actions = {
-            'test_asset_connectivity': self._test_connectivity,
-            'check_rate_limit': self._check_rate_limit,
-            'lookup_rdata_ip': self._lookup_rdata_ip,
-            'lookup_rdata_name': self._lookup_rdata_name,
-            'lookup_rdata_raw': self._lookup_rdata_raw,
-            'lookup_rrset': self._lookup_rrset,
-            'flex_search': self._flex_search
+            "test_asset_connectivity": self._test_connectivity,
+            "check_rate_limit": self._check_rate_limit,
+            "lookup_rdata_ip": self._lookup_rdata_ip,
+            "lookup_rdata_name": self._lookup_rdata_name,
+            "lookup_rdata_raw": self._lookup_rdata_raw,
+            "lookup_rrset": self._lookup_rrset,
+            "flex_search": self._flex_search,
         }
 
         action = self.get_action_identifier()
@@ -670,12 +691,12 @@ class DnsdbConnector(BaseConnector):
         try:
             run_action = supported_actions[action]
         except:
-            raise ValueError('action %r is not supported' % action)
+            raise ValueError("action %r is not supported" % action)
 
         return run_action(param)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
 
     import pudb

@@ -6,7 +6,7 @@ Connector Version: 2.1.1
 Product Vendor: Farsight Security, Inc.  
 Product Name: DNSDB  
 Product Version Supported (regex): ".\*"  
-Minimum Product Version: 5.5.0  
+Minimum Product Version: 6.3.0  
 
 This app supports investigative DNS lookup actions on DNSDB
 
