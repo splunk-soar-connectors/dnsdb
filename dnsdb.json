@@ -5,10 +5,10 @@
     "publisher": "Splunk",
     "package_name": "phantom_dnsdb",
     "type": "investigative",
-    "license": "Copyright (c) 2016-2023 Splunk Inc.",
+    "license": "Copyright (c) 2016-2024 Splunk Inc.",
     "main_module": "dnsdb_connector.py",
-    "app_version": "2.1.1",
-    "utctime_updated": "2022-01-29T02:16:14.000000Z",
+    "app_version": "2.1.2",
+    "utctime_updated": "2024-12-03T23:04:43.000000Z",
     "product_vendor": "Farsight Security, Inc.",
     "product_name": "DNSDB",
     "contributors": [
@@ -22,7 +22,7 @@
         "Cloud API, v2.0, 2023-04-10"
     ],
     "product_version_regex": ".*",
-    "min_phantom_version": "5.5.0",
+    "min_phantom_version": "6.3.0",
     "logo": "logo_dnsdb.svg",
     "logo_dark": "logo_dnsdb_dark.svg",
     "directory": "dnsdb_adf140f0-60e3-45ff-8d69-258b3c0a63b1",
@@ -1502,26 +1502,6 @@
             {
                 "module": "dnsdb2",
                 "input_file": "wheels/py3/dnsdb2-1.1.3-py3-none-any.whl"
-            }
-        ]
-    },
-    "pip_dependencies": {
-        "wheel": [
-            {
-                "module": "dnsdb2",
-                "input_file": "wheels/py3/dnsdb2-1.1.3-py3-none-any.whl"
-            },
-            {
-                "module": "importlib_metadata",
-                "input_file": "wheels/py3/importlib_metadata-4.8.3-py3-none-any.whl"
-            },
-            {
-                "module": "typing_extensions",
-                "input_file": "wheels/py3/typing_extensions-4.1.1-py3-none-any.whl"
-            },
-            {
-                "module": "zipp",
-                "input_file": "wheels/py3/zipp-3.6.0-py3-none-any.whl"
             }
         ]
     }
