@@ -1,6 +1,6 @@
 # File: dnsdb_consts.py
 #
-# Copyright (c) 2016-2024 Splunk Inc.
+# Copyright (c) 2016-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,16 +57,16 @@ DNSDB_TEST_CONNECTIVITY_SUCCESS_MESSAGE = "Test succeeded. Query quota is %s wit
 DNSDB_REST_RESP_SUCCESS = 200
 DNSDB_REST_RESP_SUCCESS_MESSAGE = "Request Successful"
 DNSDB_REST_RESP_RESOURCE_INCORRECT = 400
-DNSDB_REST_RESP_RESOURCE_INCORRECT_MESSAGE = "Invalid input. The resource is in " "an incorrect format"
+DNSDB_REST_RESP_RESOURCE_INCORRECT_MESSAGE = "Invalid input. The resource is in an incorrect format"
 DNSDB_REST_RESP_ACCESS_DENIED = 403
 DNSDB_REST_RESP_ACCESS_DENIED_MESSAGE = "The API key is invalid"
 DNSDB_REST_RESP_RESOURCE_NOT_FOUND = 404
 DNSDB_REST_RESP_RESOURCE_NOT_FOUND_MESSAGE = "Resource not found"
 DNSDB_REST_RESP_LIC_EXCEED = 429
-DNSDB_REST_RESP_LIC_EXCEED_MESSAGE = "The license count usage for the given " "period has been exceeded."
+DNSDB_REST_RESP_LIC_EXCEED_MESSAGE = "The license count usage for the given period has been exceeded."
 DNSDB_REST_RESP_OVERLOADED = 503
-DNSDB_REST_RESP_OVERLOADED_MESSAGE = "Server is overloaded. Retry your call " "after the time period displayed."
-DNSDB_ERROR_JSON_PARSE = "Unable to parse the fields parameter into a " "dictionary. , Response text - {raw_text}"
+DNSDB_REST_RESP_OVERLOADED_MESSAGE = "Server is overloaded. Retry your call after the time period displayed."
+DNSDB_ERROR_JSON_PARSE = "Unable to parse the fields parameter into a dictionary. , Response text - {raw_text}"
 DNSDB_ERROR_FROM_SERVER = "API failed, Status code: {status}, Detail: {detail}"
 DNSDB_ERROR_SERVER_CONNECTION = "Connection failed"
 DNSDB_REST_RESP_OTHER_ERROR_MESSAGE = "Error occurred"

@@ -5,7 +5,7 @@
     "publisher": "Splunk",
     "package_name": "phantom_dnsdb",
     "type": "investigative",
-    "license": "Copyright (c) 2016-2024 Splunk Inc.",
+    "license": "Copyright (c) 2016-2025 Splunk Inc.",
     "main_module": "dnsdb_connector.py",
     "app_version": "2.1.2",
     "utctime_updated": "2024-12-03T23:04:43.000000Z",

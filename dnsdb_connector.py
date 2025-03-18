@@ -1,6 +1,6 @@
 # File: dnsdb_connector.py
 #
-# Copyright (c) 2016-2024 Splunk Inc.
+# Copyright (c) 2016-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
 # the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
-from __future__ import print_function, unicode_literals
 
 import json
 import re
@@ -29,11 +28,9 @@ from dnsdb_consts import *
 
 
 class DnsdbConnector(BaseConnector):
-
     def __init__(self):
-
         # Call the BaseConnector's init first
-        super(DnsdbConnector, self).__init__()
+        super().__init__()
         self._client = None
         self._api_key = None
         return
@@ -61,9 +58,9 @@ class DnsdbConnector(BaseConnector):
 
         try:
             if error_code in DNSDB_ERROR_CODE_MESSAGE:
-                error_text = "Error Message: {0}".format(error_message)
+                error_text = f"Error Message: {error_message}"
             else:
-                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_message)
+                error_text = f"Error Code: {error_code}. Error Message: {error_message}"
         except:
             self.debug_print(DNSDB_PARSE_ERROR_MESSAGE)
             error_text = DNSDB_PARSE_ERROR_MESSAGE
@@ -88,7 +85,6 @@ class DnsdbConnector(BaseConnector):
     # Overriding domain validation for dnsdb
     # to allow wildcard domain search
     def _validate_domain(self, param):
-
         if len(param) > 255:
             return False
         if phantom.is_ip(param):
@@ -116,7 +112,6 @@ class DnsdbConnector(BaseConnector):
         return phantom.APP_SUCCESS
 
     def _test_connectivity(self, param):
-
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.save_progress(DNSDB_TEST_CONNECTIVITY_MESSAGE)
 
@@ -137,22 +132,20 @@ class DnsdbConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Rate limit details fetched successfully")
 
     def _check_rate_limit(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         self.debug_print("Calling test connectivity for checking rate limit")
         return self._test_connectivity(param)
 
     def _is_ipv6(self, address):
-
         try:
             socket.inet_pton(socket.AF_INET6, address)
 
-        except socket.error:  # not a valid v6 address
+        except OSError:  # not a valid v6 address
             return False
 
         return True
 
     def _lookup_rrset(self, param):
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Getting mandatory input parameters
@@ -213,7 +206,6 @@ class DnsdbConnector(BaseConnector):
             rdata = resp.get("rdata", [])
 
             for i, curr_rdata in enumerate(rdata):
-
                 # if type is SOA, split the data and strip it, even if . is not present, this
                 # will still execute without an error
                 if resp.get("rrtype") == "SOA":
@@ -259,7 +251,6 @@ class DnsdbConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _lookup_rdata_ip(self, param):
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Getting mandatory input parameter
@@ -291,7 +282,7 @@ class DnsdbConnector(BaseConnector):
 
         # Endpoint as per parameter given
         if network_prefix is not None:
-            ip = "%s,%s" % (ip, network_prefix)
+            ip = f"{ip},{network_prefix}"
 
         # Constructing request parameters based on input
         # Validating the input parameters provided
@@ -334,7 +325,6 @@ class DnsdbConnector(BaseConnector):
         count_domain = set()
 
         for resp in responses:
-
             if "rrname" in resp:
                 resp["rrname"] = resp["rrname"].rstrip(".")
                 count_domain.add(resp["rrname"])
@@ -348,7 +338,6 @@ class DnsdbConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _lookup_rdata_name(self, param):
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Getting mandatory input parameter
@@ -402,7 +391,6 @@ class DnsdbConnector(BaseConnector):
         count_domain = set()
 
         for resp in responses:
-
             if "rrname" in resp:
                 resp["rrname"] = resp["rrname"].rstrip(".")
                 count_domain.add(resp["rrname"])
@@ -416,7 +404,6 @@ class DnsdbConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _lookup_rdata_raw(self, param):
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Getting mandatory input parameter
@@ -476,7 +463,6 @@ class DnsdbConnector(BaseConnector):
         count_domain = set()
 
         for resp in responses:
-
             if DNSDB_JSON_RRNAME in resp:
                 resp[DNSDB_JSON_RRNAME] = resp[DNSDB_JSON_RRNAME].rstrip(".")
                 count_domain.add(resp[DNSDB_JSON_RRNAME])
@@ -490,7 +476,6 @@ class DnsdbConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _flex_search(self, param):
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Getting mandatory input parameter
@@ -674,7 +659,6 @@ class DnsdbConnector(BaseConnector):
         return True
 
     def handle_action(self, param):
-
         # Supported actions by app
         supported_actions = {
             "test_asset_connectivity": self._test_connectivity,
@@ -691,7 +675,7 @@ class DnsdbConnector(BaseConnector):
         try:
             run_action = supported_actions[action]
         except:
-            raise ValueError("action %r is not supported" % action)
+            raise ValueError(f"action {action!r} is not supported")
 
         return run_action(param)
 
