@@ -41,27 +41,24 @@ class DnsdbConnector(BaseConnector):
         :return: error message
         """
 
+        error_code = DNSDB_ERROR_CODE_MESSAGE
+        error_message = DNSDB_ERROR_MESSAGE_UNAVAILABLE
         try:
             if e.args:
                 if len(e.args) > 1:
                     error_code = e.args[0]
                     error_message = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = DNSDB_ERROR_CODE_MESSAGE
                     error_message = e.args[0]
-            else:
-                error_code = DNSDB_ERROR_CODE_MESSAGE
-                error_message = DNSDB_ERROR_MESSAGE_UNAVAILABLE
-        except:
-            error_code = DNSDB_ERROR_CODE_MESSAGE
-            error_message = DNSDB_ERROR_MESSAGE_UNAVAILABLE
+        except Exception:
+            pass
 
         try:
             if error_code in DNSDB_ERROR_CODE_MESSAGE:
                 error_text = f"Error Message: {error_message}"
             else:
                 error_text = f"Error Code: {error_code}. Error Message: {error_message}"
-        except:
+        except Exception:
             self.debug_print(DNSDB_PARSE_ERROR_MESSAGE)
             error_text = DNSDB_PARSE_ERROR_MESSAGE
 
@@ -509,6 +506,7 @@ class DnsdbConnector(BaseConnector):
         # Something went wrong while validing input parameters
         if phantom.is_fail(ret_val):
             return action_result.get_status()
+        responses = []
         try:
             if rrtype == "RDATA" and search_type == "regex":
                 responses = list(
