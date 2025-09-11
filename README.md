@@ -1,9 +1,9 @@
 # DNSDB
 
-Publisher: Splunk \
-Connector Version: 2.1.2 \
-Product Vendor: Farsight Security, Inc. \
-Product Name: DNSDB \
+Publisher: Splunk <br>
+Connector Version: 2.1.2 <br>
+Product Vendor: Farsight Security, Inc. <br>
+Product Name: DNSDB <br>
 Minimum Product Version: 6.3.0
 
 This app supports investigative DNS lookup actions on DNSDB
@@ -219,19 +219,19 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity \
-[check rate limit](#action-check-rate-limit) - Get data of current data limit \
-[rdata name lookup](#action-rdata-name-lookup) - Performs Name RDATA Lookup \
-[rdata ip lookup](#action-rdata-ip-lookup) - Performs IP RDATA Lookup \
-[rdata raw lookup](#action-rdata-raw-lookup) - Lookup raw RDATA \
-[rrset lookup](#action-rrset-lookup) - Perform a DNSDB RRSET lookup \
+[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity <br>
+[check rate limit](#action-check-rate-limit) - Get data of current data limit <br>
+[rdata name lookup](#action-rdata-name-lookup) - Performs Name RDATA Lookup <br>
+[rdata ip lookup](#action-rdata-ip-lookup) - Performs IP RDATA Lookup <br>
+[rdata raw lookup](#action-rdata-raw-lookup) - Lookup raw RDATA <br>
+[rrset lookup](#action-rrset-lookup) - Perform a DNSDB RRSET lookup <br>
 [flex search](#action-flex-search) - Perform a Flex search
 
 ## action: 'test connectivity'
 
 Validate the asset configuration for connectivity
 
-Type: **test** \
+Type: **test** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -246,7 +246,7 @@ No Output
 
 Get data of current data limit
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -272,7 +272,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Performs Name RDATA Lookup
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 If the <b>limit</b> parameter is not specified, the action will use 200.
@@ -316,7 +316,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Performs IP RDATA Lookup
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 If the <b>limit</b> parameter is not specified, the action will use 200.
@@ -362,7 +362,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Lookup raw RDATA
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 If the <b>limit</b> parameter is not specified, the action will use 200.
@@ -406,7 +406,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Perform a DNSDB RRSET lookup
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 If the <b>limit</b> parameter is not specified, the action will use 200.
@@ -464,7 +464,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Perform a Flex search
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 If the <b>limit</b> parameter is not specified, the action will use default value as 10000.
