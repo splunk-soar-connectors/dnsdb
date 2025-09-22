@@ -8,7 +8,7 @@
     "license": "Copyright (c) 2016-2025 Splunk Inc.",
     "main_module": "dnsdb_connector.py",
     "app_version": "2.1.2",
-    "utctime_updated": "2024-12-03T23:04:43.000000Z",
+    "utctime_updated": "2025-09-22T21:17:44.981259Z",
     "product_vendor": "Farsight Security, Inc.",
     "product_name": "DNSDB",
     "contributors": [
