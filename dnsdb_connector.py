@@ -405,6 +405,8 @@ class DnsdbConnector(BaseConnector):
 
         # Getting mandatory input parameter
         raw_rdata = param[DNSDB_JSON_RAW_RDATA]
+        if not re.fullmatch(r"[0-9A-Fa-f]+", raw_rdata) or len(raw_rdata) % 2:
+            return action_result.set_status(phantom.APP_ERROR, "raw_rdata must be an even-length hexadecimal string")
         # Getting optional input parameter
         limit = param.get(DNSDB_JSON_LIMIT, 200)
         ret_val, limit = self._validate_integer(action_result, limit, DNSDB_LIMIT_KEY)
