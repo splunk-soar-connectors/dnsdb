@@ -15,7 +15,7 @@
 {% block widget_content %}
   <!-- Main Start Block -->
   <!--File: dnsdb_lookup_info.html
-Copyright (c) 2016-2025 Splunk Inc.
+Copyright (c) 2016-2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -141,7 +141,7 @@ and limitations under the License.
                     <tr>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['dnsdb rdata'], 'value': '{{ curr_rdata.raw_rdata }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['dnsdb rdata'], 'value': '{{ curr_rdata.raw_rdata|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_rdata.rdata }}
                           &nbsp;
                           <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -171,7 +171,7 @@ and limitations under the License.
                     <tr>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_rrname.rrname }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_rrname.rrname|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_rrname.rrname }}
                           &nbsp;
                           <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -192,7 +192,7 @@ and limitations under the License.
               <td>IP</td>
               <td>
                 <a href="javascript:;"
-                   onclick="context_menu(this, [{'contains': ['ip', 'dnsdb ipv6'], 'value': '{{ result.param.ip }}' }], 0, {{ container.id }}, null, false);">
+                   onclick="context_menu(this, [{'contains': ['ip', 'dnsdb ipv6'], 'value': '{{ result.param.ip|escapejs }}' }], 0, {{ container.id }}, null, false);">
                   {{ result.param.ip }}
                   &nbsp;
                   <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -205,7 +205,7 @@ and limitations under the License.
               <td>Name</td>
               <td>
                 <a href="javascript:;"
-                   onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ result.param.name }}' }], 0, {{ container.id }}, null, false);">
+                   onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ result.param.name|escapejs }}' }], 0, {{ container.id }}, null, false);">
                   {{ result.param.name }}
                   &nbsp;
                   <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -272,7 +272,7 @@ and limitations under the License.
                 <tr>
                   <td>
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_domain }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_domain|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ curr_domain }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -299,7 +299,7 @@ and limitations under the License.
                 <tr>
                   <td>
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ data.rrname }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ data.rrname|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ data.rrname }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -307,7 +307,7 @@ and limitations under the License.
                   </td>
                   <td>
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['dnsdb rrtype'], 'value': '{{ data.rrtype }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['dnsdb rrtype'], 'value': '{{ data.rrtype|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ data.rrtype }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -317,7 +317,7 @@ and limitations under the License.
                     {% for rdata in data.rdata %}
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ rdata }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ rdata|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ rdata }}
                           &nbsp;
                           <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -328,7 +328,7 @@ and limitations under the License.
                     <td>
                       {% for rdata in data.rdata %}
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['ip', 'dnsdb ipv6'], 'value': '{{ rdata }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['ip', 'dnsdb ipv6'], 'value': '{{ rdata|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ rdata }}
                           &nbsp;
                           <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -354,7 +354,7 @@ and limitations under the License.
             <td>Raw RDATA</td>
             <td>
               <a href="javascript:;"
-                 onclick="context_menu(this, [{'contains': ['dnsdb rdata'],'value': '{{ result.param.raw_rdata }}' }], 0, {{ container.id }}, null, false);">
+                 onclick="context_menu(this, [{'contains': ['dnsdb rdata'],'value': '{{ result.param.raw_rdata|escapejs }}' }], 0, {{ container.id }}, null, false);">
                 {{ result.param.raw_rdata }}
                 &nbsp;
                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -414,7 +414,7 @@ and limitations under the License.
                 <tr>
                   <td>
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_result }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_result|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ curr_result }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -441,7 +441,7 @@ and limitations under the License.
                 <tr>
                   <td>
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ data.rrname }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ data.rrname|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ data.rrname }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -449,7 +449,7 @@ and limitations under the License.
                   </td>
                   <td>
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['dnsdb rrtype'], 'value': '{{ data.rrtype }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['dnsdb rrtype'], 'value': '{{ data.rrtype|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ data.rrtype }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -458,7 +458,7 @@ and limitations under the License.
                   <td>
                     {% for rdata in data.rdata %}
                       <a href="javascript:;"
-                         onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ rdata }}' }], 0, {{ container.id }}, null, false);">
+                         onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ rdata|escapejs }}' }], 0, {{ container.id }}, null, false);">
                         {{ rdata }}
                         &nbsp;
                         <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -483,7 +483,7 @@ and limitations under the License.
             <td>Domain</td>
             <td>
               <a href="javascript:;"
-                 onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ result.param.owner_name }}' }], 0, {{ container.id }}, null, false);">
+                 onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ result.param.owner_name|escapejs }}' }], 0, {{ container.id }}, null, false);">
                 {{ result.param.owner_name }}
                 &nbsp;
                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -579,7 +579,7 @@ and limitations under the License.
                     <tr>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['host name'], 'value': '{{ curr_rdata.rdata_origin }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['host name'], 'value': '{{ curr_rdata.rdata_origin|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_rdata.rdata_origin }}
                           &nbsp;
                           <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -587,7 +587,7 @@ and limitations under the License.
                       </td>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['email'], 'value': '{{ curr_rdata.rdata_mail_addr }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['email'], 'value': '{{ curr_rdata.rdata_mail_addr|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_rdata.rdata_mail_addr }}
                           &nbsp;
                           <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -625,7 +625,7 @@ and limitations under the License.
                       <td>{{ curr_rdata.rdata_preference }}</td>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_rdata.rdata_mail_exchange }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_rdata.rdata_mail_exchange|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_rdata.rdata_mail_exchange }}
                           &nbsp;
                           <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -656,21 +656,21 @@ and limitations under the License.
                       <td>
                         {% if curr_rrtype == 'A' %}
                           <a href="javascript:;"
-                             onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ curr_rdata }}' }], 0, {{ container.id }}, null, false);">
+                             onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ curr_rdata|escapejs }}' }], 0, {{ container.id }}, null, false);">
                             {{ curr_rdata }}
                             &nbsp;
                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                           </a>
                         {% elif curr_rrtype == 'AAAA' %}
                           <a href="javascript:;"
-                             onclick="context_menu(this, [{'contains': ['dnsdb ipv6'], 'value': '{{ curr_rdata }}' }], 0, {{ container.id }}, null, false);">
+                             onclick="context_menu(this, [{'contains': ['dnsdb ipv6'], 'value': '{{ curr_rdata|escapejs }}' }], 0, {{ container.id }}, null, false);">
                             {{ curr_rdata }}
                             &nbsp;
                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                           </a>
                         {% elif curr_rrtype == 'NS' or curr_rrtype == 'CNAME' %}
                           <a href="javascript:;"
-                             onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_rdata }}' }], 0, {{ container.id }}, null, false);">
+                             onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_rdata|escapejs }}' }], 0, {{ container.id }}, null, false);">
                             {{ curr_rdata }}
                             &nbsp;
                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
