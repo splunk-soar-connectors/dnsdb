@@ -1,4 +1,1 @@
 **Unreleased**
-
-* Validated raw RDATA as even-length hexadecimal before constructing DNSDB requests
-* Escaped attacker-controlled DNSDB values used by inline widget JavaScript
