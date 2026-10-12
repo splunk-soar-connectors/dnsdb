@@ -1,10 +1,10 @@
-# DNSDB
+# dnsdb
 
 Publisher: Splunk <br>
-Connector Version: 2.1.3 <br>
+Connector Version: 3.0.0 <br>
 Product Vendor: Farsight Security, Inc. <br>
 Product Name: DNSDB <br>
-Minimum Product Version: 6.3.0
+Minimum Product Version: 7.0.0
 
 This app supports investigative DNS lookup actions on DNSDB
 
@@ -209,9 +209,14 @@ This app supports investigative DNS lookup actions on DNSDB
   - RRSET Lookup
   - RDATA Raw Lookup
 
+1. ### Make Request
+   - Sends an authenticated HTTP request to the DNSDB API (base URL
+     https://api.dnsdb.info/dnsdb/v2). The API key from the asset configuration is added
+     automatically, so only the endpoint path (for example, /rate_limit) needs to be provided.
+
 ### Configuration variables
 
-This table lists the configuration variables required to operate DNSDB. These variables are specified when configuring a DNSDB asset in Splunk SOAR.
+This table lists the configuration variables required to operate dnsdb. These variables are specified when configuring a DNSDB asset in Splunk SOAR.
 
 VARIABLE | REQUIRED | TYPE | DESCRIPTION
 -------- | -------- | ---- | -----------
@@ -219,20 +224,23 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity <br>
+[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity. <br>
+[make request](#action-make-request) - Make an authenticated request to the DNSDB API. <br>
 [check rate limit](#action-check-rate-limit) - Get data of current data limit <br>
-[rdata name lookup](#action-rdata-name-lookup) - Performs Name RDATA Lookup <br>
-[rdata ip lookup](#action-rdata-ip-lookup) - Performs IP RDATA Lookup <br>
-[rdata raw lookup](#action-rdata-raw-lookup) - Lookup raw RDATA <br>
-[rrset lookup](#action-rrset-lookup) - Perform a DNSDB RRSET lookup <br>
+[lookup rdata name](#action-lookup-rdata-name) - Performs Name RDATA Lookup <br>
+[lookup rdata ip](#action-lookup-rdata-ip) - Performs IP RDATA Lookup <br>
+[lookup rdata raw](#action-lookup-rdata-raw) - Lookup raw RDATA <br>
+[lookup rrset](#action-lookup-rrset) - Perform a DNSDB RRSET lookup <br>
 [flex search](#action-flex-search) - Perform a Flex search
 
 ## action: 'test connectivity'
 
-Validate the asset configuration for connectivity
+Validate the asset configuration for connectivity.
 
 Type: **test** <br>
 Read only: **True**
+
+Basic test for app.
 
 #### Action Parameters
 
@@ -240,7 +248,51 @@ No parameters are required for this action
 
 #### Action Output
 
-No Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string | | success failure |
+action_result.message | string | | |
+summary.total_objects | numeric | | 1 |
+summary.total_objects_successful | numeric | | 1 |
+
+## action: 'make request'
+
+Make an authenticated request to the DNSDB API.
+
+Type: **generic** <br>
+Read only: **False**
+
+'make request' action for the app. Used to handle arbitrary HTTP requests with the app's asset
+
+#### Action Parameters
+
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**http_method** | required | The HTTP method to use for the request. | string | |
+**endpoint** | required | DNSDB API endpoint to call, appended to the base URL (https://api.dnsdb.info/dnsdb/v2). Do not include the base URL. Example: '/lookup/rrset/name/example.com' | string | |
+**headers** | optional | The headers to send with the request (JSON object). An example is {'Content-Type': 'application/json'} | string | |
+**query_parameters** | optional | Parameters to append to the URL (JSON object or query string). An example is ?key=value&key2=value2 | string | |
+**body** | optional | The body to send with the request (JSON object). An example is {'key': 'value', 'key2': 'value2'} | string | |
+**timeout** | optional | The timeout for the request in seconds. | numeric | |
+**verify_ssl** | optional | Whether to verify the SSL certificate. Default is True. | boolean | |
+
+#### Action Output
+
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string | | success failure |
+action_result.message | string | | |
+action_result.parameter.http_method | string | | |
+action_result.parameter.endpoint | string | | |
+action_result.parameter.headers | string | | |
+action_result.parameter.query_parameters | string | | |
+action_result.parameter.body | string | | |
+action_result.parameter.timeout | numeric | | |
+action_result.parameter.verify_ssl | boolean | | |
+action_result.data.\*.status_code | numeric | | 200 |
+action_result.data.\*.response_body | string | | {} |
+summary.total_objects | numeric | | 1 |
+summary.total_objects_successful | numeric | | 1 |
 
 ## action: 'check rate limit'
 
@@ -257,18 +309,17 @@ No parameters are required for this action
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
+action_result.status | string | | success failure |
+action_result.message | string | | |
 action_result.data.\*.reset | numeric | | 1618617600 |
 action_result.data.\*.remaining | numeric | | 992 |
 action_result.data.\*.limit | numeric | | 1000 |
 action_result.data.\*.offset_max | numeric | | 3000000 |
 action_result.data.\*.results_max | numeric | | 1000000 |
-action_result.status | string | | success failed |
-action_result.message | string | | Rate limit details fetched successfully |
-action_result.summary | string | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
-## action: 'rdata name lookup'
+## action: 'lookup rdata name'
 
 Performs Name RDATA Lookup
 
@@ -292,27 +343,27 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.parameter.name | string | `domain` | www.farsightsecurity.com |
-action_result.parameter.time_first_before | string | | -31536000 2021-01-05T12:06:02Z |
-action_result.parameter.time_first_after | string | | -31536000 2021-01-05T12:06:02Z |
-action_result.parameter.time_last_before | string | | -31536000 2021-01-05T12:06:02Z |
-action_result.parameter.time_last_after | string | | -31536000 2021-01-05T12:06:02Z |
-action_result.parameter.limit | numeric | | 200 |
+action_result.status | string | | success failure |
+action_result.message | string | | |
+action_result.parameter.name | string | `domain` | |
+action_result.parameter.time_first_after | string | | |
+action_result.parameter.time_first_before | string | | |
+action_result.parameter.time_last_after | string | | |
+action_result.parameter.time_last_before | string | | |
+action_result.parameter.limit | numeric | | |
 action_result.data.\*.count | numeric | | 100 |
-action_result.data.\*.rdata | string | `domain` | www.farsightsecurity.com |
 action_result.data.\*.rrname | string | `domain` | 207.4.20.149.in-addr.fsi.io. |
 action_result.data.\*.rrtype | string | | A |
 action_result.data.\*.time_last | numeric | | 1566085287 |
 action_result.data.\*.time_first | numeric | | 1566085287 |
 action_result.data.\*.zone_time_last | numeric | | 1566085287 |
 action_result.data.\*.zone_time_first | numeric | | 1566085287 |
-action_result.status | string | | success failed |
-action_result.message | string | | Total domains: 190 |
+action_result.data.\*.rdata | string | `domain` | www.farsightsecurity.com |
 action_result.summary.total_domains | numeric | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
-## action: 'rdata ip lookup'
+## action: 'lookup rdata ip'
 
 Performs IP RDATA Lookup
 
@@ -337,28 +388,28 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.parameter.ip | string | `ip` `dnsdb ipv6` | 192.0.2.1 |
-action_result.parameter.network_prefix | numeric | | 24 |
-action_result.parameter.time_first_before | string | | -31536000 2021-01-05T12:06:02Z |
-action_result.parameter.time_first_after | string | | -31536000 2021-01-05T12:06:02Z |
-action_result.parameter.time_last_before | string | | -31536000 2021-01-05T12:06:02Z |
-action_result.parameter.time_last_after | string | | -31536000 2021-01-05T12:06:02Z |
-action_result.parameter.limit | numeric | | 200 |
+action_result.status | string | | success failure |
+action_result.message | string | | |
+action_result.parameter.ip | string | `ip` `dnsdb ipv6` | |
+action_result.parameter.network_prefix | numeric | | |
+action_result.parameter.time_first_after | string | | |
+action_result.parameter.time_first_before | string | | |
+action_result.parameter.time_last_after | string | | |
+action_result.parameter.time_last_before | string | | |
+action_result.parameter.limit | numeric | | |
 action_result.data.\*.count | numeric | | 100 |
-action_result.data.\*.rdata | string | `ip` `dnsdb ipv6` | 192.0.2.1 |
 action_result.data.\*.rrname | string | `domain` | ns1.uceb.org. |
 action_result.data.\*.rrtype | string | `dnsdb rrtype` | A |
 action_result.data.\*.time_last | numeric | | 1566085287 |
 action_result.data.\*.time_first | numeric | | 1566085287 |
 action_result.data.\*.zone_time_last | numeric | | 1566085287 |
 action_result.data.\*.zone_time_first | numeric | | 1566085287 |
-action_result.status | string | | success failed |
-action_result.message | string | | Total domains: 190 |
+action_result.data.\*.rdata | string | `ip` `dnsdb ipv6` | 192.0.2.1 |
 action_result.summary.total_domains | numeric | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
-## action: 'rdata raw lookup'
+## action: 'lookup rdata raw'
 
 Lookup raw RDATA
 
@@ -383,26 +434,26 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.parameter.raw_rdata | string | `dnsdb rdata` | 0366736902696f00 |
-action_result.parameter.type | string | `dnsdb rrtype` | A |
-action_result.parameter.time_first_before | string | | -31536000 2021-01-05T12:06:02Z |
-action_result.parameter.time_first_after | string | | -31536000 2021-01-05T12:06:02Z |
-action_result.parameter.time_last_before | string | | -31536000 2021-01-05T12:06:02Z |
-action_result.parameter.time_last_after | string | | -31536000 2021-01-05T12:06:02Z |
-action_result.parameter.limit | numeric | | 200 |
+action_result.status | string | | success failure |
+action_result.message | string | | |
+action_result.parameter.raw_rdata | string | `dnsdb rdata` | |
+action_result.parameter.type | string | `dnsdb rrtype` | |
+action_result.parameter.time_first_after | string | | |
+action_result.parameter.time_first_before | string | | |
+action_result.parameter.time_last_after | string | | |
+action_result.parameter.time_last_before | string | | |
+action_result.parameter.limit | numeric | | |
 action_result.data.\*.count | numeric | | 100 |
-action_result.data.\*.rdata | string | `ip` `dnsdb ipv6` | fsi.io. hostmaster.fsi.io. 2014052828 7200 3600 25920000 3600 |
 action_result.data.\*.rrname | string | `domain` | dnstap.info |
 action_result.data.\*.rrtype | string | `dnsdb rrtype` | A |
 action_result.data.\*.time_last | numeric | | 1566085287 |
 action_result.data.\*.time_first | numeric | | 1566085287 |
-action_result.status | string | | success failed |
-action_result.message | string | | Total domains: 200 |
+action_result.data.\*.rdata | string | `ip` `dnsdb ipv6` | fsi.io. hostmaster.fsi.io. 2014052828 7200 3600 25920000 3600 |
 action_result.summary.total_domains | numeric | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
-## action: 'rrset lookup'
+## action: 'lookup rrset'
 
 Perform a DNSDB RRSET lookup
 
@@ -428,15 +479,24 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.parameter.owner_name | string | `domain` | www.farsightsecurity.com |
-action_result.parameter.type | string | `dnsdb rrtype` | A |
-action_result.parameter.bailiwick | string | | com. |
-action_result.parameter.time_first_before | string | | -31536000 2021-01-05T12:06:02Z |
-action_result.parameter.time_first_after | string | | -31536000 2021-01-05T12:06:02Z |
-action_result.parameter.time_last_before | string | | -31536000 2021-01-05T12:06:02Z |
-action_result.parameter.time_last_after | string | | -31536000 2021-01-05T12:06:02Z |
-action_result.parameter.limit | numeric | | 200 |
-action_result.data.\*.count | numeric | | 100 |
+action_result.status | string | | success failure |
+action_result.message | string | | |
+action_result.parameter.owner_name | string | `domain` | |
+action_result.parameter.type | string | `dnsdb rrtype` | |
+action_result.parameter.time_first_after | string | | |
+action_result.parameter.time_first_before | string | | |
+action_result.parameter.time_last_after | string | | |
+action_result.parameter.time_last_before | string | | |
+action_result.parameter.bailiwick | string | | |
+action_result.parameter.limit | numeric | | |
+action_result.data.\*.count | numeric | | |
+action_result.data.\*.rrname | string | `domain` | farsightsecurity.com |
+action_result.data.\*.rrtype | string | `dnsdb rrtype` | A |
+action_result.data.\*.bailiwick | string | `domain` | farsightsecurity.com. |
+action_result.data.\*.time_last | numeric | | 1566085287 |
+action_result.data.\*.time_first | numeric | | 1566085287 |
+action_result.data.\*.zone_time_last | numeric | | 1566085287 |
+action_result.data.\*.zone_time_first | numeric | | 1566085287 |
 action_result.data.\*.rdata | string | `ip` `dnsdb ipv6` `domain` | 66.160.140.81 |
 action_result.data.\*.rdata.\*.rdata_origin | string | `host name` | fsi.io. |
 action_result.data.\*.rdata.\*.rdata_mail_addr | string | `email` | hostmaster.fsi.io |
@@ -447,16 +507,7 @@ action_result.data.\*.rdata.\*.rdata_expire | string | | 604800 |
 action_result.data.\*.rdata.\*.rdata_minimum | string | | 3600 |
 action_result.data.\*.rdata.\*.rdata_preference | string | | 10 |
 action_result.data.\*.rdata.\*.rdata_mail_exchange | string | `domain` | ss.vix.su |
-action_result.data.\*.rrname | string | `domain` | farsightsecurity.com |
-action_result.data.\*.rrtype | string | `dnsdb rrtype` | A |
-action_result.data.\*.bailiwick | string | `domain` | farsightsecurity.com. |
-action_result.data.\*.time_last | numeric | | 1566085287 |
-action_result.data.\*.time_first | numeric | | 1566085287 |
-action_result.data.\*.zone_time_last | numeric | | 1566085287 |
-action_result.data.\*.zone_time_first | numeric | | 1566085287 |
-action_result.status | string | | success failed |
-action_result.message | string | | Total items: 200 |
-action_result.summary.total_items | numeric | | 200 |
+action_result.summary.total_items | numeric | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
@@ -487,26 +538,18 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.parameter.search_type | string | | regex glob |
-action_result.parameter.type | string | | RDATA RRNAMES |
-action_result.parameter.query | string | | ^[1-3]\*.\*.com ns[0-9]\*.net. |
-action_result.parameter.time_first_after | string | | -31536000 2021-01-05T12:06:02Z |
-action_result.parameter.time_first_before | string | | -31536000 2021-01-05T12:06:02Z |
-action_result.parameter.time_last_after | string | | -31536000 2021-01-05T12:06:02Z |
-action_result.parameter.time_last_before | string | | -31536000 2021-01-05T12:06:02Z |
-action_result.parameter.limit | numeric | | 10000 |
-action_result.parameter.exclude | string | | \\.(com|site|bid|net|io)\\ |
-action_result.data.\*.count | numeric | | 100 |
-action_result.data.\*.rdata | string | `ip` `dnsdb ipv6` `domain` | 66.160.140.81 |
-action_result.data.\*.rdata.\*.rdata_origin | string | `host name` | fsi.io. |
-action_result.data.\*.rdata.\*.rdata_mail_addr | string | `email` | hostmaster.fsi.io |
-action_result.data.\*.rdata.\*.rdata_serial | string | | 2015040254 |
-action_result.data.\*.rdata.\*.rdata_refresh | string | | 7200 |
-action_result.data.\*.rdata.\*.rdata_retry | string | | 3600 |
-action_result.data.\*.rdata.\*.rdata_expire | string | | 604800 |
-action_result.data.\*.rdata.\*.rdata_minimum | string | | 3600 |
-action_result.data.\*.rdata.\*.rdata_preference | string | | 10 |
-action_result.data.\*.rdata.\*.rdata_mail_exchange | string | `domain` | ss.vix.su |
+action_result.status | string | | success failure |
+action_result.message | string | | |
+action_result.parameter.query | string | | |
+action_result.parameter.type | string | | |
+action_result.parameter.search_type | string | | |
+action_result.parameter.time_first_after | string | | |
+action_result.parameter.time_first_before | string | | |
+action_result.parameter.time_last_after | string | | |
+action_result.parameter.time_last_before | string | | |
+action_result.parameter.exclude | string | | |
+action_result.parameter.limit | numeric | | |
+action_result.data.\*.count | numeric | | |
 action_result.data.\*.rrname | string | `domain` | farsightsecurity.com |
 action_result.data.\*.rrtype | string | `dnsdb rrtype` | A |
 action_result.data.\*.bailiwick | string | `domain` | farsightsecurity.com. |
@@ -515,9 +558,8 @@ action_result.data.\*.time_first | numeric | | 1566085287 |
 action_result.data.\*.zone_time_last | numeric | | 1566085287 |
 action_result.data.\*.zone_time_first | numeric | | 1566085287 |
 action_result.data.\*.raw_rdata | string | | 0366736902696f00 |
-action_result.status | string | | success failed |
-action_result.message | string | | Total items: 10062 |
-action_result.summary.total_items | numeric | | 200 |
+action_result.data.\*.rdata | string | `ip` `dnsdb ipv6` `domain` | 66.160.140.81 |
+action_result.summary.total_items | numeric | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
