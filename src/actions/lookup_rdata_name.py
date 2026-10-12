@@ -13,7 +13,7 @@
 
 from typing import Any, ClassVar
 
-from pydantic import field_validator
+from pydantic.functional_validators import field_validator
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField
 from soar_sdk.exceptions import ActionFailure
@@ -51,9 +51,9 @@ class RdataNameLookupParams(Params):
     # TODO: domain validator on hold pending team decision. Legacy never enforced it (dead code),
     # and it rejects the documented left-hand wildcard (".example.com"). To re-enable, restore
     # `validate_domain` in the ..dnsdb_client import and uncomment the block below.
-    # @field_validator("name")  # noqa: ERA001
-    # @classmethod  # noqa: ERA001
-    # def _validate_name(cls, value: str) -> str:  # noqa: ERA001
+    # @field_validator("name")
+    # @classmethod
+    # def _validate_name(cls, value: str) -> str:
     #     return validate_domain(value)  # noqa: ERA001
 
     @field_validator("limit", mode="before")
@@ -89,11 +89,13 @@ def display_rdata_name_lookup(outputs: list[RdataNameLookupOutput]) -> dict:
 def lookup_rdata_name(
     params: RdataNameLookupParams, soar: SOARClient, asset: Asset
 ) -> list[RdataNameLookupOutput]:
-    time_first_before, time_first_after, time_last_before, time_last_after = validate_time_params(
-        params.time_first_before,
-        params.time_first_after,
-        params.time_last_before,
-        params.time_last_after,
+    time_first_before, time_first_after, time_last_before, time_last_after = (
+        validate_time_params(
+            params.time_first_before,
+            params.time_first_after,
+            params.time_last_before,
+            params.time_last_after,
+        )
     )
 
     try:

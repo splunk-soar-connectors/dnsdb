@@ -13,7 +13,7 @@
 
 from typing import Any, ClassVar
 
-from pydantic import field_validator
+from pydantic.functional_validators import field_validator
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField
 from soar_sdk.exceptions import ActionFailure
@@ -66,7 +66,9 @@ class RdataIpLookupOutput(PassthroughOutput):
     RDATA_EXAMPLE: ClassVar[str] = "192.0.2.1"
 
     count: int | None = OutputField(example_values=[100])
-    rrname: str | None = OutputField(cef_types=["domain"], example_values=["ns1.uceb.org."])
+    rrname: str | None = OutputField(
+        cef_types=["domain"], example_values=["ns1.uceb.org."]
+    )
     rrtype: str | None = OutputField(cef_types=["dnsdb rrtype"], example_values=["A"])
     time_last: int | None = OutputField(example_values=[1566085287])
     time_first: int | None = OutputField(example_values=[1566085287])
@@ -93,13 +95,19 @@ def lookup_rdata_ip(
                 DNSDB_INVALID_NETWORK_PREFIX.format(prefix=params.network_prefix)
             )
 
-    ip = f"{params.ip},{params.network_prefix}" if params.network_prefix is not None else params.ip
+    ip = (
+        f"{params.ip},{params.network_prefix}"
+        if params.network_prefix is not None
+        else params.ip
+    )
 
-    time_first_before, time_first_after, time_last_before, time_last_after = validate_time_params(
-        params.time_first_before,
-        params.time_first_after,
-        params.time_last_before,
-        params.time_last_after,
+    time_first_before, time_first_after, time_last_before, time_last_after = (
+        validate_time_params(
+            params.time_first_before,
+            params.time_first_after,
+            params.time_last_before,
+            params.time_last_after,
+        )
     )
 
     try:

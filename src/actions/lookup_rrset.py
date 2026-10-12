@@ -15,7 +15,7 @@ import itertools
 from collections.abc import Iterator
 from typing import Any, ClassVar
 
-from pydantic import field_validator
+from pydantic.functional_validators import field_validator
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import (
     ActionOutput,
@@ -80,9 +80,9 @@ class RrsetLookupParams(Params):
 
     # TODO: domain validator on hold pending team decision. Legacy never enforced it (dead code).
     # To re-enable, restore `validate_domain` in the ..dnsdb_client import and uncomment below.
-    # @field_validator("owner_name")  # noqa: ERA001
-    # @classmethod  # noqa: ERA001
-    # def _validate_owner_name(cls, value: str) -> str:  # noqa: ERA001
+    # @field_validator("owner_name")
+    # @classmethod
+    # def _validate_owner_name(cls, value: str) -> str:
     #     return validate_domain(value)  # noqa: ERA001
 
     @field_validator("type")
@@ -90,7 +90,9 @@ class RrsetLookupParams(Params):
     def _validate_type(cls, value: str | None) -> str | None:
         if value and value not in DNSDB_LOOKUP_TYPE_VALUE_LIST:
             raise ValueError(
-                DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(value_list=DNSDB_LOOKUP_TYPE_VALUE_LIST, key="type")
+                DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(
+                    value_list=DNSDB_LOOKUP_TYPE_VALUE_LIST, key="type"
+                )
             )
         return value
 
@@ -182,11 +184,13 @@ def lookup_rrset(
 ) -> list[RrsetLookupOutput]:
     record_type = params.type or "ANY"
 
-    time_first_before, time_first_after, time_last_before, time_last_after = validate_time_params(
-        params.time_first_before,
-        params.time_first_after,
-        params.time_last_before,
-        params.time_last_after,
+    time_first_before, time_first_after, time_last_before, time_last_after = (
+        validate_time_params(
+            params.time_first_before,
+            params.time_first_after,
+            params.time_last_before,
+            params.time_last_after,
+        )
     )
 
     try:

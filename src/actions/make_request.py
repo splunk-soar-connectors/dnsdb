@@ -46,9 +46,7 @@ class DnsdbMakeRequestOutput(ActionOutput):
         return cls(status_code=response.status_code, response_body=response.text)
 
 
-def http_action(
-    params: DnsdbMakeRequestParams, asset: Asset
-) -> DnsdbMakeRequestOutput:
+def http_action(params: DnsdbMakeRequestParams, asset: Asset) -> DnsdbMakeRequestOutput:
     """Make an authenticated request to the DNSDB API."""
     if params.endpoint.startswith(("http://", "https://")):
         raise ActionFailure(

@@ -1,4 +1,4 @@
-# dnsdb
+# DNSDB
 
 Publisher: Splunk <br>
 Connector Version: 3.0.0 <br>
@@ -216,7 +216,7 @@ This app supports investigative DNS lookup actions on DNSDB
 
 ### Configuration variables
 
-This table lists the configuration variables required to operate dnsdb. These variables are specified when configuring a DNSDB asset in Splunk SOAR.
+This table lists the configuration variables required to operate DNSDB. These variables are specified when configuring a DNSDB asset in Splunk SOAR.
 
 VARIABLE | REQUIRED | TYPE | DESCRIPTION
 -------- | -------- | ---- | -----------

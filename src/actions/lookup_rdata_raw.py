@@ -15,14 +15,20 @@ import re
 
 from typing import Any, ClassVar
 
-from pydantic import field_validator
+from pydantic.functional_validators import field_validator
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
-from ..dnsdb_client import format_unknown_error, get_client, map_known_dnsdb_error, validate_integer, validate_time_params
+from ..dnsdb_client import (
+    format_unknown_error,
+    get_client,
+    map_known_dnsdb_error,
+    validate_integer,
+    validate_time_params,
+)
 from ..dnsdb_consts import (
     DNSDB_DATA_NOT_AVAILABLE_MESSAGE,
     DNSDB_INVALID_HEX_RDATA,
@@ -72,7 +78,9 @@ class RdataRawLookupParams(Params):
     def _validate_type(cls, value: str | None) -> str | None:
         if value and value not in DNSDB_LOOKUP_TYPE_VALUE_LIST:
             raise ValueError(
-                DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(value_list=DNSDB_LOOKUP_TYPE_VALUE_LIST, key="type")
+                DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(
+                    value_list=DNSDB_LOOKUP_TYPE_VALUE_LIST, key="type"
+                )
             )
         return value
 
@@ -84,10 +92,14 @@ class RdataRawLookupParams(Params):
 
 class RdataRawLookupOutput(PassthroughOutput):
     RDATA_CEF_TYPES: ClassVar[list[str]] = ["ip", "dnsdb ipv6"]
-    RDATA_EXAMPLE: ClassVar[str] = "fsi.io. hostmaster.fsi.io. 2014052828 7200 3600 25920000 3600"
+    RDATA_EXAMPLE: ClassVar[str] = (
+        "fsi.io. hostmaster.fsi.io. 2014052828 7200 3600 25920000 3600"
+    )
 
     count: int | None = OutputField(example_values=[100])
-    rrname: str | None = OutputField(cef_types=["domain"], example_values=["dnstap.info"])
+    rrname: str | None = OutputField(
+        cef_types=["domain"], example_values=["dnstap.info"]
+    )
     rrtype: str | None = OutputField(cef_types=["dnsdb rrtype"], example_values=["A"])
     time_last: int | None = OutputField(example_values=[1566085287])
     time_first: int | None = OutputField(example_values=[1566085287])
@@ -105,11 +117,13 @@ def display_rdata_raw_lookup(outputs: list[RdataRawLookupOutput]) -> dict:
 def lookup_rdata_raw(
     params: RdataRawLookupParams, soar: SOARClient, asset: Asset
 ) -> list[RdataRawLookupOutput]:
-    time_first_before, time_first_after, time_last_before, time_last_after = validate_time_params(
-        params.time_first_before,
-        params.time_first_after,
-        params.time_last_before,
-        params.time_last_after,
+    time_first_before, time_first_after, time_last_before, time_last_after = (
+        validate_time_params(
+            params.time_first_before,
+            params.time_first_after,
+            params.time_last_before,
+            params.time_last_after,
+        )
     )
 
     try:

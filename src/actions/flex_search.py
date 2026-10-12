@@ -13,14 +13,20 @@
 
 from typing import Any, ClassVar
 
-from pydantic import field_validator
+from pydantic.functional_validators import field_validator
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
-from ..dnsdb_client import format_unknown_error, get_client, map_known_dnsdb_error, validate_integer, validate_time_params
+from ..dnsdb_client import (
+    format_unknown_error,
+    get_client,
+    map_known_dnsdb_error,
+    validate_integer,
+    validate_time_params,
+)
 from ..dnsdb_consts import (
     DNSDB_DATA_NOT_AVAILABLE_MESSAGE,
     DNSDB_FLEX_SEARCH_TYPE_VALUE_LIST,
@@ -59,7 +65,9 @@ class FlexSearchParams(Params):
     def _validate_type(cls, value: str) -> str:
         if value not in DNSDB_FLEX_TYPE_VALUE_LIST:
             raise ValueError(
-                DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(value_list=DNSDB_FLEX_TYPE_VALUE_LIST, key="type")
+                DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(
+                    value_list=DNSDB_FLEX_TYPE_VALUE_LIST, key="type"
+                )
             )
         return value
 
@@ -68,7 +76,9 @@ class FlexSearchParams(Params):
     def _validate_search_type(cls, value: str) -> str:
         if value not in DNSDB_FLEX_SEARCH_TYPE_VALUE_LIST:
             raise ValueError(
-                DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(value_list=DNSDB_FLEX_SEARCH_TYPE_VALUE_LIST, key="search_type")
+                DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(
+                    value_list=DNSDB_FLEX_SEARCH_TYPE_VALUE_LIST, key="search_type"
+                )
             )
         return value
 
@@ -109,11 +119,13 @@ def display_flex_search(outputs: list[FlexSearchOutput]) -> dict:
 def flex_search(
     params: FlexSearchParams, soar: SOARClient, asset: Asset
 ) -> list[FlexSearchOutput]:
-    time_first_before, time_first_after, time_last_before, time_last_after = validate_time_params(
-        params.time_first_before,
-        params.time_first_after,
-        params.time_last_before,
-        params.time_last_after,
+    time_first_before, time_first_after, time_last_before, time_last_after = (
+        validate_time_params(
+            params.time_first_before,
+            params.time_first_after,
+            params.time_last_before,
+            params.time_last_after,
+        )
     )
 
     client = get_client(asset)

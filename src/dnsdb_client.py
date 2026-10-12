@@ -185,7 +185,12 @@ def validate_time_params(
     time_last_before: str | None,
     time_last_after: str | None,
 ) -> tuple[str | None, str | None, str | None, str | None]:
-    timestamps = [time_first_before, time_first_after, time_last_before, time_last_after]
+    timestamps = [
+        time_first_before,
+        time_first_after,
+        time_last_before,
+        time_last_after,
+    ]
 
     for value in timestamps:
         if value and not _is_valid_time(value):
@@ -200,6 +205,6 @@ def validate_time_params(
                 raise ActionFailure(DNSDB_INVALID_TIME)
         except ValueError:
             if int(value) > int(now.timestamp()):
-                raise ActionFailure(DNSDB_INVALID_TIME)
+                raise ActionFailure(DNSDB_INVALID_TIME) from None
 
     return time_first_before, time_first_after, time_last_before, time_last_after

@@ -21,7 +21,7 @@ from .test_connectivity import run_test_connectivity
 
 def create_dnsdb_app() -> App:
     app = App(
-        name="dnsdb",
+        name="DNSDB",
         app_type="investigative",
         logo="logo_dnsdb.svg",
         logo_dark="logo_dnsdb_dark.svg",
