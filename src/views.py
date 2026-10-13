@@ -13,7 +13,6 @@
 def _parse_data(data, param):
     res = {}
 
-    # parsing data for flex search action
     if "query" in param:
         res["flex"] = {}
         rrtypes = set(map(lambda x: x["rrtype"], data))
@@ -21,7 +20,6 @@ def _parse_data(data, param):
             res["flex"][curr_rrtype] = []
         for match in data:
             res["flex"][match["rrtype"]].append(match)
-    # parsing data for lookup ip action
     elif "ip" in param or "name" in param:
         res["response"] = {}
         res["response"] = data
@@ -34,7 +32,6 @@ def _parse_data(data, param):
         for rt in res["ip"]:
             if isinstance(res["ip"][rt], set):
                 res["ip"][rt] = list(res["ip"][rt])
-    # parsing data for lookup raw rdata action
     elif "raw_rdata" in param:
         res["response"] = {}
         res["response"] = data
@@ -47,13 +44,11 @@ def _parse_data(data, param):
         for rt in res["raw"]:
             if isinstance(res["raw"][rt], set):
                 res["raw"][rt] = list(res["raw"][rt])
-    # parsing data for lookup domain action
     elif "owner_name" in param or ("type" in param and param["type"] == "RRSET"):
         res["domain"] = {}
         rrtype = param.get("type", "ANY")
         rrtypes = set(map(lambda x: x["rrtype"], data))
 
-        # if data contains multiple record types
         if rrtype in ("ANY", "ANY-DNSSEC"):
             for curr_rrtype in rrtypes:
                 if curr_rrtype in ["SOA", "MX"]:
@@ -61,7 +56,6 @@ def _parse_data(data, param):
                 else:
                     res["domain"][curr_rrtype] = set()
 
-        # if specific record type selected
         elif rrtype in ["SOA", "MX"]:
             res["domain"][rrtype] = []
         else:

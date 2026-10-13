@@ -316,7 +316,6 @@ action_result.data.\*.remaining | numeric | | 992 |
 action_result.data.\*.limit | numeric | | 1000 |
 action_result.data.\*.offset_max | numeric | | 3000000 |
 action_result.data.\*.results_max | numeric | | 1000000 |
-action_result.summary | string | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
@@ -352,6 +351,7 @@ action_result.parameter.time_first_before | string | | |
 action_result.parameter.time_last_after | string | | |
 action_result.parameter.time_last_before | string | | |
 action_result.parameter.limit | numeric | | |
+action_result.data.\*.rdata.\* | string | `domain` | www.farsightsecurity.com |
 action_result.data.\*.count | numeric | | 100 |
 action_result.data.\*.rrname | string | `domain` | 207.4.20.149.in-addr.fsi.io. |
 action_result.data.\*.rrtype | string | | A |
@@ -359,7 +359,6 @@ action_result.data.\*.time_last | numeric | | 1566085287 |
 action_result.data.\*.time_first | numeric | | 1566085287 |
 action_result.data.\*.zone_time_last | numeric | | 1566085287 |
 action_result.data.\*.zone_time_first | numeric | | 1566085287 |
-action_result.data.\*.rdata | string | `domain` | www.farsightsecurity.com |
 action_result.summary.total_domains | numeric | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
@@ -398,6 +397,7 @@ action_result.parameter.time_first_before | string | | |
 action_result.parameter.time_last_after | string | | |
 action_result.parameter.time_last_before | string | | |
 action_result.parameter.limit | numeric | | |
+action_result.data.\*.rdata.\* | string | `ip` `dnsdb ipv6` | 192.0.2.1 |
 action_result.data.\*.count | numeric | | 100 |
 action_result.data.\*.rrname | string | `domain` | ns1.uceb.org. |
 action_result.data.\*.rrtype | string | `dnsdb rrtype` | A |
@@ -405,7 +405,6 @@ action_result.data.\*.time_last | numeric | | 1566085287 |
 action_result.data.\*.time_first | numeric | | 1566085287 |
 action_result.data.\*.zone_time_last | numeric | | 1566085287 |
 action_result.data.\*.zone_time_first | numeric | | 1566085287 |
-action_result.data.\*.rdata | string | `ip` `dnsdb ipv6` | 192.0.2.1 |
 action_result.summary.total_domains | numeric | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
@@ -444,12 +443,12 @@ action_result.parameter.time_first_before | string | | |
 action_result.parameter.time_last_after | string | | |
 action_result.parameter.time_last_before | string | | |
 action_result.parameter.limit | numeric | | |
+action_result.data.\*.rdata.\* | string | `ip` `dnsdb ipv6` | fsi.io. hostmaster.fsi.io. 2014052828 7200 3600 25920000 3600 |
 action_result.data.\*.count | numeric | | 100 |
 action_result.data.\*.rrname | string | `domain` | dnstap.info |
 action_result.data.\*.rrtype | string | `dnsdb rrtype` | A |
 action_result.data.\*.time_last | numeric | | 1566085287 |
 action_result.data.\*.time_first | numeric | | 1566085287 |
-action_result.data.\*.rdata | string | `ip` `dnsdb ipv6` | fsi.io. hostmaster.fsi.io. 2014052828 7200 3600 25920000 3600 |
 action_result.summary.total_domains | numeric | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
@@ -550,6 +549,7 @@ action_result.parameter.time_last_after | string | | |
 action_result.parameter.time_last_before | string | | |
 action_result.parameter.exclude | string | | |
 action_result.parameter.limit | numeric | | |
+action_result.data.\*.rdata | string | `ip` `dnsdb ipv6` `domain` | 66.160.140.81 |
 action_result.data.\*.count | numeric | | |
 action_result.data.\*.rrname | string | `domain` | farsightsecurity.com |
 action_result.data.\*.rrtype | string | `dnsdb rrtype` | A |
@@ -559,16 +559,6 @@ action_result.data.\*.time_first | numeric | | 1566085287 |
 action_result.data.\*.zone_time_last | numeric | | 1566085287 |
 action_result.data.\*.zone_time_first | numeric | | 1566085287 |
 action_result.data.\*.raw_rdata | string | | 0366736902696f00 |
-action_result.data.\*.rdata | string | `ip` `dnsdb ipv6` `domain` | 66.160.140.81 |
-action_result.data.\*.rdata.\*.rdata_origin | string | `host name` | fsi.io. |
-action_result.data.\*.rdata.\*.rdata_mail_addr | string | `email` | hostmaster.fsi.io |
-action_result.data.\*.rdata.\*.rdata_serial | string | | 2015040254 |
-action_result.data.\*.rdata.\*.rdata_refresh | string | | 7200 |
-action_result.data.\*.rdata.\*.rdata_retry | string | | 3600 |
-action_result.data.\*.rdata.\*.rdata_expire | string | | 604800 |
-action_result.data.\*.rdata.\*.rdata_minimum | string | | 3600 |
-action_result.data.\*.rdata.\*.rdata_preference | string | | 10 |
-action_result.data.\*.rdata.\*.rdata_mail_exchange | string | `domain` | ss.vix.su |
 action_result.summary.total_items | numeric | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |

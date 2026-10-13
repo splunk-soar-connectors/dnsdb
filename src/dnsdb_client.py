@@ -11,6 +11,7 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 
+import calendar
 import contextlib
 import re
 import socket
@@ -35,6 +36,7 @@ from .dnsdb_consts import (
     DNSDB_QUOTA_EXCEEDED_MESSAGE,
     DNSDB_TIME_FORMAT,
     DNSDB_VALID_INTEGER_MESSAGE,
+    DNSDB_VALUE_LIST_VALIDATION_MESSAGE,
 )
 
 
@@ -98,11 +100,18 @@ def validate_integer(value: Any, key: str) -> int | None:
             raise ValueError
         number = int(value)
     except Exception:
-        raise ValueError(DNSDB_VALID_INTEGER_MESSAGE.format(key=key)) from None
+        raise ActionFailure(DNSDB_VALID_INTEGER_MESSAGE.format(key=key)) from None
 
     if number < 0:
-        raise ValueError(DNSDB_NON_NEGATIVE_INTEGER_MESSAGE.format(key=key))
+        raise ActionFailure(DNSDB_NON_NEGATIVE_INTEGER_MESSAGE.format(key=key))
     return number
+
+
+def validate_value_list(value: str | None, allowed: list[str], key: str) -> None:
+    if value and value not in allowed:
+        raise ActionFailure(
+            DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(value_list=allowed, key=key)
+        )
 
 
 def is_ipv4(value: str) -> bool:
@@ -125,8 +134,7 @@ def is_ip_address(value: str) -> bool:
     return is_ipv4(value) or is_ipv6(value)
 
 
-# legacy pattern kept as-is: the raw-string `\\d` rejects digits
-_DOMAIN_LABEL_RE = re.compile(r"(?!-)[A-Z\\d\-_]{1,63}(?<!-')$", re.IGNORECASE)
+_DOMAIN_LABEL_RE = re.compile(r"(?!-)[A-Z\d\-_]{1,63}$", re.IGNORECASE)
 
 
 def validate_domain(value: str, key: str) -> None:
@@ -158,6 +166,15 @@ def _is_valid_time(time_value: str) -> bool:
     return len(time_value) == 10 or int(time_value) < 0
 
 
+def _to_dnsdb_time(value: str | None) -> str | None:
+    if not value:
+        return value
+    try:
+        return str(calendar.timegm(time.strptime(value, DNSDB_TIME_FORMAT)))
+    except ValueError:
+        return value
+
+
 def validate_time_params(
     time_first_before: str | None,
     time_first_after: str | None,
@@ -186,4 +203,4 @@ def validate_time_params(
             if int(value) > int(now.timestamp()):
                 raise ActionFailure(DNSDB_INVALID_TIME) from None
 
-    return time_first_before, time_first_after, time_last_before, time_last_after
+    return tuple(_to_dnsdb_time(value) for value in timestamps)

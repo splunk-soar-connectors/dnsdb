@@ -62,10 +62,10 @@ def http_action(params: DnsdbMakeRequestParams, asset: Asset) -> DnsdbMakeReques
         try:
             user_headers = json.loads(params.headers)
         except (json.JSONDecodeError, TypeError) as e:
-            raise ActionFailure(f"Invalid JSON headers: {params.headers}") from e
+            raise ActionFailure("The 'headers' parameter must be valid JSON") from e
         if not isinstance(user_headers, dict):
             raise ActionFailure("The 'headers' parameter must be a JSON object")
-        headers.update(user_headers)
+        headers = {**user_headers, DNSDB_API_KEY_HEADER: asset.api_key}
 
     query_params = None
     if params.query_parameters:
@@ -88,7 +88,7 @@ def http_action(params: DnsdbMakeRequestParams, asset: Asset) -> DnsdbMakeReques
         try:
             body = json.loads(params.body)
         except (json.JSONDecodeError, TypeError) as e:
-            raise ActionFailure(f"Invalid JSON body: {params.body}") from e
+            raise ActionFailure("The 'body' parameter must be valid JSON") from e
 
     timeout = params.timeout or DNSDB_DEFAULT_TIMEOUT
 

@@ -11,11 +11,8 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 
-from typing import Any, ClassVar
-
-from pydantic.functional_validators import field_validator
 from soar_sdk.abstract import SOARClient
-from soar_sdk.action_results import ActionOutput, OutputField
+from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
@@ -29,7 +26,6 @@ from ..dnsdb_client import (
     validate_time_params,
 )
 from ..dnsdb_consts import DNSDB_DATA_NOT_AVAILABLE_MESSAGE
-from ..outputs import PassthroughOutput
 
 
 class RdataNameLookupParams(Params):
@@ -46,18 +42,13 @@ class RdataNameLookupParams(Params):
     time_last_before: str | None = Param(
         description="Record last seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)"
     )
-    limit: int | None = Param(description="Max records to return", default=200)
-
-    @field_validator("limit", mode="before")
-    @classmethod
-    def _validate_limit(cls, value: Any) -> int | None:
-        return validate_integer(value, "limit")
+    limit: float | None = Param(description="Max records to return", default=200)
 
 
-class RdataNameLookupOutput(PassthroughOutput):
-    RDATA_CEF_TYPES: ClassVar[list[str]] = ["domain"]
-    RDATA_EXAMPLE: ClassVar[str] = "www.farsightsecurity.com"
-
+class RdataNameLookupOutput(PermissiveActionOutput):
+    rdata: list[str] | None = OutputField(
+        cef_types=["domain"], example_values=["www.farsightsecurity.com"]
+    )
     count: int | None = OutputField(example_values=[100])
     rrname: str | None = OutputField(
         cef_types=["domain"], example_values=["207.4.20.149.in-addr.fsi.io."]
@@ -77,6 +68,7 @@ def lookup_rdata_name(
     params: RdataNameLookupParams, soar: SOARClient, asset: Asset
 ) -> list[RdataNameLookupOutput]:
     validate_domain(params.name, "name")
+    limit = validate_integer(params.limit, "limit")
 
     time_first_before, time_first_after, time_last_before, time_last_after = (
         validate_time_params(
@@ -91,7 +83,7 @@ def lookup_rdata_name(
         responses = list(
             get_client(asset).lookup_rdata_name(
                 params.name,
-                limit=params.limit,
+                limit=limit,
                 time_first_before=time_first_before,
                 time_first_after=time_first_after,
                 time_last_before=time_last_before,

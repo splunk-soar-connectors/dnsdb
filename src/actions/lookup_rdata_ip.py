@@ -11,11 +11,8 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 
-from typing import Any, ClassVar
-
-from pydantic.functional_validators import field_validator
 from soar_sdk.abstract import SOARClient
-from soar_sdk.action_results import ActionOutput, OutputField
+from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
@@ -32,14 +29,13 @@ from ..dnsdb_consts import (
     DNSDB_DATA_NOT_AVAILABLE_MESSAGE,
     DNSDB_INVALID_NETWORK_PREFIX,
 )
-from ..outputs import PassthroughOutput
 
 
 class RdataIpLookupParams(Params):
     ip: str = Param(
         description="IP to resolve", primary=True, cef_types=["ip", "dnsdb ipv6"]
     )
-    network_prefix: int | None = Param(description="Network prefix")
+    network_prefix: float | None = Param(description="Network prefix")
     time_first_after: str | None = Param(
         description="Record first seen after (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)"
     )
@@ -52,18 +48,13 @@ class RdataIpLookupParams(Params):
     time_last_before: str | None = Param(
         description="Record last seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)"
     )
-    limit: int | None = Param(description="Max records to return", default=200)
-
-    @field_validator("limit", "network_prefix", mode="before")
-    @classmethod
-    def _validate_integer_params(cls, value: Any, info) -> int | None:
-        return validate_integer(value, info.field_name)
+    limit: float | None = Param(description="Max records to return", default=200)
 
 
-class RdataIpLookupOutput(PassthroughOutput):
-    RDATA_CEF_TYPES: ClassVar[list[str]] = ["ip", "dnsdb ipv6"]
-    RDATA_EXAMPLE: ClassVar[str] = "192.0.2.1"
-
+class RdataIpLookupOutput(PermissiveActionOutput):
+    rdata: list[str] | None = OutputField(
+        cef_types=["ip", "dnsdb ipv6"], example_values=["192.0.2.1"]
+    )
     count: int | None = OutputField(example_values=[100])
     rrname: str | None = OutputField(
         cef_types=["domain"], example_values=["ns1.uceb.org."]
@@ -82,18 +73,17 @@ class RdataIpLookupSummary(ActionOutput):
 def lookup_rdata_ip(
     params: RdataIpLookupParams, soar: SOARClient, asset: Asset
 ) -> list[RdataIpLookupOutput]:
-    if params.network_prefix is not None:
+    network_prefix = validate_integer(params.network_prefix, "network_prefix")
+    limit = validate_integer(params.limit, "limit")
+
+    if network_prefix is not None:
         max_prefix = 32 if is_ipv4(params.ip) else 128
-        if not (0 <= params.network_prefix <= max_prefix):
+        if not (0 <= network_prefix <= max_prefix):
             raise ActionFailure(
-                DNSDB_INVALID_NETWORK_PREFIX.format(prefix=params.network_prefix)
+                DNSDB_INVALID_NETWORK_PREFIX.format(prefix=network_prefix)
             )
 
-    ip = (
-        f"{params.ip},{params.network_prefix}"
-        if params.network_prefix is not None
-        else params.ip
-    )
+    ip = f"{params.ip},{network_prefix}" if network_prefix is not None else params.ip
 
     time_first_before, time_first_after, time_last_before, time_last_after = (
         validate_time_params(
@@ -108,7 +98,7 @@ def lookup_rdata_ip(
         responses = list(
             get_client(asset).lookup_rdata_ip(
                 ip,
-                limit=params.limit,
+                limit=limit,
                 time_first_before=time_first_before,
                 time_first_after=time_first_after,
                 time_last_before=time_last_before,

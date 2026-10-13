@@ -13,11 +13,8 @@
 
 import re
 
-from typing import Any, ClassVar
-
-from pydantic.functional_validators import field_validator
 from soar_sdk.abstract import SOARClient
-from soar_sdk.action_results import ActionOutput, OutputField
+from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
@@ -28,14 +25,13 @@ from ..dnsdb_client import (
     map_known_dnsdb_error,
     validate_integer,
     validate_time_params,
+    validate_value_list,
 )
 from ..dnsdb_consts import (
     DNSDB_DATA_NOT_AVAILABLE_MESSAGE,
     DNSDB_INVALID_HEX_RDATA,
     DNSDB_LOOKUP_TYPE_VALUE_LIST,
-    DNSDB_VALUE_LIST_VALIDATION_MESSAGE,
 )
-from ..outputs import PassthroughOutput
 
 _HEX_RE = re.compile(r"[0-9A-Fa-f]+")
 
@@ -63,38 +59,16 @@ class RdataRawLookupParams(Params):
     time_last_before: str | None = Param(
         description="Record last seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)"
     )
-    limit: int | None = Param(description="Max records to return", default=200)
-
-    @field_validator("raw_rdata")
-    @classmethod
-    def _validate_raw_rdata(cls, value: str) -> str:
-        if not _HEX_RE.fullmatch(value) or len(value) % 2:
-            raise ValueError(DNSDB_INVALID_HEX_RDATA)
-        return value
-
-    @field_validator("type")
-    @classmethod
-    def _validate_type(cls, value: str | None) -> str | None:
-        if value and value not in DNSDB_LOOKUP_TYPE_VALUE_LIST:
-            raise ValueError(
-                DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(
-                    value_list=DNSDB_LOOKUP_TYPE_VALUE_LIST, key="type"
-                )
-            )
-        return value
-
-    @field_validator("limit", mode="before")
-    @classmethod
-    def _validate_limit(cls, value: Any) -> int | None:
-        return validate_integer(value, "limit")
+    limit: float | None = Param(description="Max records to return", default=200)
 
 
-class RdataRawLookupOutput(PassthroughOutput):
-    RDATA_CEF_TYPES: ClassVar[list[str]] = ["ip", "dnsdb ipv6"]
-    RDATA_EXAMPLE: ClassVar[str] = (
-        "fsi.io. hostmaster.fsi.io. 2014052828 7200 3600 25920000 3600"
+class RdataRawLookupOutput(PermissiveActionOutput):
+    rdata: list[str] | None = OutputField(
+        cef_types=["ip", "dnsdb ipv6"],
+        example_values=[
+            "fsi.io. hostmaster.fsi.io. 2014052828 7200 3600 25920000 3600"
+        ],
     )
-
     count: int | None = OutputField(example_values=[100])
     rrname: str | None = OutputField(
         cef_types=["domain"], example_values=["dnstap.info"]
@@ -111,6 +85,11 @@ class RdataRawLookupSummary(ActionOutput):
 def lookup_rdata_raw(
     params: RdataRawLookupParams, soar: SOARClient, asset: Asset
 ) -> list[RdataRawLookupOutput]:
+    if not _HEX_RE.fullmatch(params.raw_rdata) or len(params.raw_rdata) % 2:
+        raise ActionFailure(DNSDB_INVALID_HEX_RDATA)
+    limit = validate_integer(params.limit, "limit")
+    validate_value_list(params.type, DNSDB_LOOKUP_TYPE_VALUE_LIST, "type")
+
     time_first_before, time_first_after, time_last_before, time_last_after = (
         validate_time_params(
             params.time_first_before,
@@ -124,8 +103,8 @@ def lookup_rdata_raw(
         responses = list(
             get_client(asset).lookup_rdata_raw(
                 params.raw_rdata,
-                rrtype=params.type,
-                limit=params.limit,
+                rrtype=params.type or "ANY",
+                limit=limit,
                 time_first_before=time_first_before,
                 time_first_after=time_first_after,
                 time_last_before=time_last_before,

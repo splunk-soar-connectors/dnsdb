@@ -13,14 +13,12 @@
 
 import itertools
 from collections.abc import Iterator
-from typing import Any, ClassVar
-
-from pydantic.functional_validators import field_validator
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import (
     ActionOutput,
     OutputField,
     OutputFieldSpecification,
+    PermissiveActionOutput,
 )
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
@@ -33,14 +31,13 @@ from ..dnsdb_client import (
     validate_domain,
     validate_integer,
     validate_time_params,
+    validate_value_list,
 )
 from ..dnsdb_consts import (
     DNSDB_DATA_NOT_AVAILABLE_MESSAGE,
     DNSDB_INVALID_BAILIWICK,
     DNSDB_LOOKUP_TYPE_VALUE_LIST,
-    DNSDB_VALUE_LIST_VALIDATION_MESSAGE,
 )
-from ..outputs import PassthroughOutput
 
 _SOA_FIELDS = (
     "rdata_origin",
@@ -76,23 +73,7 @@ class RrsetLookupParams(Params):
         description="Record last seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)"
     )
     bailiwick: str | None = Param(description="Bailiwick")
-    limit: int | None = Param(description="Max records to return", default=200)
-
-    @field_validator("type")
-    @classmethod
-    def _validate_type(cls, value: str | None) -> str | None:
-        if value and value not in DNSDB_LOOKUP_TYPE_VALUE_LIST:
-            raise ValueError(
-                DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(
-                    value_list=DNSDB_LOOKUP_TYPE_VALUE_LIST, key="type"
-                )
-            )
-        return value
-
-    @field_validator("limit", mode="before")
-    @classmethod
-    def _validate_limit(cls, value: Any) -> int | None:
-        return validate_integer(value, "limit")
+    limit: float | None = Param(description="Max records to return", default=200)
 
 
 class RdataOutput(ActionOutput):
@@ -115,10 +96,7 @@ class RdataOutput(ActionOutput):
     )
 
 
-class RrsetLookupOutput(PassthroughOutput):
-    RDATA_CEF_TYPES: ClassVar[list[str]] = ["ip", "dnsdb ipv6", "domain"]
-    RDATA_EXAMPLE: ClassVar[str] = "66.160.140.81"
-
+class RrsetLookupOutput(PermissiveActionOutput):
     count: int | None = None
     rrname: str | None = OutputField(
         cef_types=["domain"], example_values=["farsightsecurity.com"]
@@ -138,7 +116,14 @@ class RrsetLookupOutput(PassthroughOutput):
         parent_datapath: str = "action_result.data.*",
         column_order_counter: itertools.count | None = None,
     ) -> Iterator[OutputFieldSpecification]:
+        # rdata mixes plain strings and SOA/MX objects, which one field type can't declare
         yield from super()._to_json_schema(parent_datapath, column_order_counter)
+        yield OutputFieldSpecification(
+            data_path=f"{parent_datapath}.rdata",
+            data_type="string",
+            contains=["ip", "dnsdb ipv6", "domain"],
+            example_values=["66.160.140.81"],
+        )
         yield from RdataOutput._to_json_schema(
             f"{parent_datapath}.rdata.*", column_order_counter
         )
@@ -166,6 +151,8 @@ def lookup_rrset(
     params: RrsetLookupParams, soar: SOARClient, asset: Asset
 ) -> list[RrsetLookupOutput]:
     validate_domain(params.owner_name, "owner_name")
+    validate_value_list(params.type, DNSDB_LOOKUP_TYPE_VALUE_LIST, "type")
+    limit = validate_integer(params.limit, "limit")
 
     record_type = params.type or "ANY"
 
@@ -184,7 +171,7 @@ def lookup_rrset(
                 params.owner_name,
                 bailiwick=params.bailiwick,
                 rrtype=record_type,
-                limit=params.limit,
+                limit=limit,
                 time_first_before=time_first_before,
                 time_first_after=time_first_after,
                 time_last_before=time_last_before,
@@ -208,7 +195,8 @@ def lookup_rrset(
 
     results: list[RrsetLookupOutput] = []
     for resp in responses:
-        resp["rdata"] = _split_rdata(resp.get("rrtype"), resp.get("rdata", []))
+        if "rdata" in resp:
+            resp["rdata"] = _split_rdata(resp.get("rrtype"), resp["rdata"])
         if "rrname" in resp:
             resp["rrname"] = resp["rrname"].rstrip(".")
         if "bailiwick" in resp:
