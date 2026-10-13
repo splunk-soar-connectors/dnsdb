@@ -10,80 +10,139 @@
 # the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
+def _parse_data(data, param):
+    res = {}
 
-_SOA_FIELDS = (
-    "rdata_origin",
-    "rdata_mail_addr",
-    "rdata_serial",
-    "rdata_refresh",
-    "rdata_retry",
-    "rdata_expire",
-    "rdata_minimum",
-)
-_MX_FIELDS = ("rdata_preference", "rdata_mail_exchange")
+    # parsing data for flex search action
+    if "query" in param:
+        res["flex"] = {}
+        rrtypes = set(map(lambda x: x["rrtype"], data))
+        for curr_rrtype in rrtypes:
+            res["flex"][curr_rrtype] = []
+        for match in data:
+            res["flex"][match["rrtype"]].append(match)
+    # parsing data for lookup ip action
+    elif "ip" in param or "name" in param:
+        res["response"] = {}
+        res["response"] = data
+        res["ip"] = {}
+        res["ip"]["domains"] = set()
+        for rdata in data:
+            if rdata["rrname"]:
+                res["ip"]["domains"].add(rdata["rrname"])
 
-_CEF_BY_RRTYPE = {
-    "A": "ip",
-    "AAAA": "dnsdb ipv6",
-    "NS": "domain",
-    "CNAME": "domain",
-}
+        for rt in res["ip"]:
+            if isinstance(res["ip"][rt], set):
+                res["ip"][rt] = list(res["ip"][rt])
+    # parsing data for lookup raw rdata action
+    elif "raw_rdata" in param:
+        res["response"] = {}
+        res["response"] = data
+        res["raw"] = {}
+        res["raw"]["domains"] = set()
+        for rdata in data:
+            if rdata["rrname"]:
+                res["raw"]["domains"].add(rdata["rrname"])
 
+        for rt in res["raw"]:
+            if isinstance(res["raw"][rt], set):
+                res["raw"][rt] = list(res["raw"][rt])
+    # parsing data for lookup domain action
+    elif "owner_name" in param or ("type" in param and param["type"] == "RRSET"):
+        res["domain"] = {}
+        rrtype = param.get("type", "ANY")
+        rrtypes = set(map(lambda x: x["rrtype"], data))
 
-def build_rdata_lookup_view(rows: list[dict], table_title: str) -> dict:
-    domains = sorted({row["rrname"] for row in rows if row.get("rrname")})
-    return {
-        "kind": "rdata_lookup",
-        "table_title": table_title,
-        "domains": domains,
-        "rows": rows,
-    }
+        # if data contains multiple record types
+        if rrtype in ("ANY", "ANY-DNSSEC"):
+            for curr_rrtype in rrtypes:
+                if curr_rrtype in ["SOA", "MX"]:
+                    res["domain"][curr_rrtype] = []
+                else:
+                    res["domain"][curr_rrtype] = set()
 
-
-def build_rrset_view(rows: list[dict]) -> dict:
-    groups: dict[str, dict] = {}
-    for row in rows:
-        rrtype = row.get("rrtype")
-        if not rrtype:
-            continue
-        group = groups.setdefault(
-            rrtype,
-            {
-                "rrtype": rrtype,
-                "is_soa": rrtype == "SOA",
-                "is_mx": rrtype == "MX",
-                "cef_type": _CEF_BY_RRTYPE.get(rrtype),
-                "rows": [],
-                "values": [],
-            },
-        )
-        rdata = row.get("rdata") or []
-        for item in rdata:
-            if rrtype in ("SOA", "MX"):
-                if item not in group["rows"]:
-                    group["rows"].append(item)
-            elif item not in group["values"]:
-                group["values"].append(item)
-
-    return {"kind": "rrset", "groups": list(groups.values())}
-
-
-def build_flex_view(rows: list[dict]) -> dict:
-    groups: dict[str, dict] = {}
-    for row in rows:
-        rrtype = row.get("rrtype")
-        if not rrtype:
-            continue
-        group = groups.setdefault(
-            rrtype,
-            {"rrtype": rrtype, "is_rrnames": False, "values": []},
-        )
-        if row.get("rrname"):
-            group["is_rrnames"] = True
-            value = row["rrname"]
+        # if specific record type selected
+        elif rrtype in ["SOA", "MX"]:
+            res["domain"][rrtype] = []
         else:
-            value = row.get("rdata") or row.get("raw_rdata")
-        if value and value not in group["values"]:
-            group["values"].append(value)
+            res["domain"][rrtype] = set()
 
-    return {"kind": "flex", "groups": list(groups.values())}
+        for rrset in data:
+            if rrset["rrtype"] in ["SOA", "MX"]:
+                res["domain"][rrset["rrtype"]] = (
+                    res["domain"][rrset["rrtype"]] + rrset["rdata"]
+                )
+            else:
+                res["domain"][rrset["rrtype"]] = res["domain"][rrset["rrtype"]].union(
+                    rrset["rdata"]
+                )
+
+        if "SOA" in res["domain"]:
+            res["domain"]["SOA"] = [
+                dict(s) for s in set(frozenset(d.items()) for d in res["domain"]["SOA"])
+            ]
+        if "MX" in res["domain"]:
+            res["domain"]["MX"] = [
+                dict(s) for s in set(frozenset(d.items()) for d in res["domain"]["MX"])
+            ]
+
+        for rt in res["domain"]:
+            if isinstance(res["domain"][rt], set):
+                res["domain"][rt] = list(res["domain"][rt])
+
+    return res
+
+
+def _get_ctx_result(result):
+    ctx_result = {}
+
+    param = result.get_param()
+    summary = result.get_summary()
+    data = result.get_data()
+
+    ctx_result["param"] = param
+    if summary:
+        ctx_result["summary"] = summary
+
+    if not data:
+        ctx_result["data"] = {}
+        return ctx_result
+
+    data = _parse_data(data, ctx_result["param"])
+
+    ctx_result["data"] = data
+    return ctx_result
+
+
+def display_lookup_info(provides, all_app_runs, context):
+    context["results"] = results = []
+    for _summary, action_results in all_app_runs:
+        for result in action_results:
+            ctx_result = _get_ctx_result(result)
+            if not ctx_result:
+                continue
+            results.append(ctx_result)
+
+    return "templates/dnsdb_lookup_info.html"
+
+
+def show_rate_limits(provides, all_app_runs, context):
+    context["results"] = results = []
+    for _summary, action_results in all_app_runs:
+        for result in action_results:
+            param = result.get_param()
+            result_summary = result.get_summary()
+            data = result.get_data()
+            ctx_result = {}
+
+            ctx_result["param"] = param
+            if result_summary:
+                ctx_result["summary"] = result_summary
+
+            if not data:
+                ctx_result["data"] = {}
+            else:
+                ctx_result["data"] = data
+            results.append(ctx_result)
+
+    return "templates/dnsdb_rate_limits.html"

@@ -24,12 +24,12 @@ from ..dnsdb_client import (
     format_unknown_error,
     get_client,
     map_known_dnsdb_error,
+    validate_domain,
     validate_integer,
     validate_time_params,
 )
 from ..dnsdb_consts import DNSDB_DATA_NOT_AVAILABLE_MESSAGE
 from ..outputs import PassthroughOutput
-from ..views import build_rdata_lookup_view
 
 
 class RdataNameLookupParams(Params):
@@ -47,14 +47,6 @@ class RdataNameLookupParams(Params):
         description="Record last seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)"
     )
     limit: int | None = Param(description="Max records to return", default=200)
-
-    # TODO: domain validator on hold pending team decision. Legacy never enforced it (dead code),
-    # and it rejects the documented left-hand wildcard (".example.com"). To re-enable, restore
-    # `validate_domain` in the ..dnsdb_client import and uncomment the block below.
-    # @field_validator("name")
-    # @classmethod
-    # def _validate_name(cls, value: str) -> str:
-    #     return validate_domain(value)  # noqa: ERA001
 
     @field_validator("limit", mode="before")
     @classmethod
@@ -81,14 +73,11 @@ class RdataNameLookupSummary(ActionOutput):
     total_domains: int | None = None
 
 
-def display_rdata_name_lookup(outputs: list[RdataNameLookupOutput]) -> dict:
-    rows = [o.model_dump() for o in outputs]
-    return build_rdata_lookup_view(rows, table_title="RDATA Lookup")
-
-
 def lookup_rdata_name(
     params: RdataNameLookupParams, soar: SOARClient, asset: Asset
 ) -> list[RdataNameLookupOutput]:
+    validate_domain(params.name, "name")
+
     time_first_before, time_first_after, time_last_before, time_last_after = (
         validate_time_params(
             params.time_first_before,

@@ -27,6 +27,7 @@ from .dnsdb_consts import (
     DNSDB_ACCESS_DENIED_MESSAGE,
     DNSDB_ERROR_CODE_MESSAGE,
     DNSDB_ERROR_MESSAGE_UNAVAILABLE,
+    DNSDB_INVALID_DOMAIN,
     DNSDB_INVALID_TIME,
     DNSDB_INVALID_TIME_FORMAT,
     DNSDB_NON_NEGATIVE_INTEGER_MESSAGE,
@@ -53,12 +54,7 @@ def map_known_dnsdb_error(error: Exception) -> ActionFailure | None:
 
 
 def log_unknown_error(error: Exception) -> None:
-    """Debug-log details that dnsdb2 drops from its exception message.
-
-    dnsdb2 re-raises unmapped HTTP errors as an argless QueryError, so the real HTTP status and
-    response body only exist on error.__cause__. Debug level only; the user-facing message is
-    unchanged.
-    """
+    """Debug-log the HTTP status and body that dnsdb2 drops from its exception."""
     cause = error.__cause__
     response = getattr(cause, "response", None)
     logger.debug(
@@ -69,12 +65,7 @@ def log_unknown_error(error: Exception) -> None:
 
 
 def format_unknown_error(error: Exception) -> str:
-    """Format an unexpected exception exactly like the legacy connector did.
-
-    - no args        -> fixed "unavailable" message
-    - one arg        -> that arg as the message
-    - two or more    -> first arg is the code, second is the message
-    """
+    """Format an unexpected exception like the legacy connector."""
     with contextlib.suppress(Exception):
         log_unknown_error(error)
 
@@ -89,7 +80,7 @@ def format_unknown_error(error: Exception) -> str:
                 error_message = error.args[0]
 
     try:
-        # Substring check mirrors legacy behavior (including its TypeError on non-string codes)
+        # legacy substring check, kept for identical messages
         if error_code in DNSDB_ERROR_CODE_MESSAGE:
             return f"Error Message: {error_message}"
         return f"Error Code: {error_code}. Error Message: {error_message}"
@@ -98,10 +89,7 @@ def format_unknown_error(error: Exception) -> str:
 
 
 def validate_integer(value: Any, key: str) -> int | None:
-    """Validate an integer action parameter exactly like the legacy connector did.
-
-    Raises ValueError with the legacy message for non-integers and negative values.
-    """
+    """Validate an integer parameter with the legacy messages."""
     if value is None:
         return None
 
@@ -137,30 +125,21 @@ def is_ip_address(value: str) -> bool:
     return is_ipv4(value) or is_ipv6(value)
 
 
-_DOMAIN_LABEL_RE = re.compile(r"(?!-)[A-Z\d\-_]{1,63}(?<!-')$", re.IGNORECASE)
+# legacy pattern kept as-is: the raw-string `\\d` rejects digits
+_DOMAIN_LABEL_RE = re.compile(r"(?!-)[A-Z\\d\-_]{1,63}(?<!-')$", re.IGNORECASE)
 
 
-def validate_domain(value: str) -> str:
-    # NOTE: currently unused (validators are commented out in the lookup actions), kept for the
-    # pending team decision. Legacy registered an equivalent validator but never applied it.
-    if len(value) > 255:
-        raise ValueError("Please provide a valid domain name")
+def validate_domain(value: str, key: str) -> None:
+    if len(value) > 255 or is_ip_address(value):
+        raise ActionFailure(DNSDB_INVALID_DOMAIN.format(key=key))
 
-    if is_ip_address(value):
-        raise ValueError("Please provide a valid domain name, not an IP address")
-
-    stripped = value[:-1] if value.endswith(".") else value
-    parts = stripped.split(".")
-
+    parts = value.removesuffix(".").split(".")
+    last = len(parts) - 1
     for idx, part in enumerate(parts):
-        is_edge = idx == 0 or idx == len(parts) - 1
-        if is_edge:
-            if not (part == "*" or _DOMAIN_LABEL_RE.match(part)):
-                raise ValueError("Please provide a valid domain name")
-        elif not _DOMAIN_LABEL_RE.match(part):
-            raise ValueError("Please provide a valid domain name")
-
-    return value
+        if idx in (0, last) and part == "*":
+            continue
+        if not _DOMAIN_LABEL_RE.match(part):
+            raise ActionFailure(DNSDB_INVALID_DOMAIN.format(key=key))
 
 
 def _is_valid_time(time_value: str) -> bool:

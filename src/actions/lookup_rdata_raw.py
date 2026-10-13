@@ -36,7 +36,6 @@ from ..dnsdb_consts import (
     DNSDB_VALUE_LIST_VALIDATION_MESSAGE,
 )
 from ..outputs import PassthroughOutput
-from ..views import build_rdata_lookup_view
 
 _HEX_RE = re.compile(r"[0-9A-Fa-f]+")
 
@@ -107,11 +106,6 @@ class RdataRawLookupOutput(PassthroughOutput):
 
 class RdataRawLookupSummary(ActionOutput):
     total_domains: int | None = None
-
-
-def display_rdata_raw_lookup(outputs: list[RdataRawLookupOutput]) -> dict:
-    rows = [o.model_dump() for o in outputs]
-    return build_rdata_lookup_view(rows, table_title="Raw RDATA Lookup")
 
 
 def lookup_rdata_raw(

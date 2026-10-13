@@ -13,86 +13,68 @@
 
 from soar_sdk.app import App
 
-from .check_rate_limit import check_rate_limit, display_rate_limit
-from .flex_search import FlexSearchSummary, display_flex_search, flex_search
-from .lookup_rdata_ip import (
-    RdataIpLookupSummary,
-    display_rdata_ip_lookup,
-    lookup_rdata_ip,
-)
-from .lookup_rdata_name import (
-    RdataNameLookupSummary,
-    display_rdata_name_lookup,
-    lookup_rdata_name,
-)
-from .lookup_rdata_raw import (
-    RdataRawLookupSummary,
-    display_rdata_raw_lookup,
-    lookup_rdata_raw,
-)
-from .lookup_rrset import RrsetLookupSummary, display_rrset_lookup, lookup_rrset
+from ..views import display_lookup_info, show_rate_limits
+from .check_rate_limit import CheckRateLimitSummary, check_rate_limit
+from .flex_search import FlexSearchSummary, flex_search
+from .lookup_rdata_ip import RdataIpLookupSummary, lookup_rdata_ip
+from .lookup_rdata_name import RdataNameLookupSummary, lookup_rdata_name
+from .lookup_rdata_raw import RdataRawLookupSummary, lookup_rdata_raw
+from .lookup_rrset import RrsetLookupSummary, lookup_rrset
 from .make_request import http_action
 
 
 def register_actions(app: App) -> App:
-    """Register all DNSDB actions on the provided app."""
     app.make_request()(http_action)
-    app.register_action(
-        action=check_rate_limit,
+    app.action(
         description="Get data of current data limit",
         action_type="investigate",
         read_only=True,
-        view_handler=display_rate_limit,
-        view_template="dnsdb_rate_limits.html",
-    )
-    app.register_action(
-        action=lookup_rdata_name,
+        summary_type=CheckRateLimitSummary,
+        view_handler=show_rate_limits,
+    )(check_rate_limit)
+    app.action(
+        name="rdata name lookup",
         description="Performs Name RDATA Lookup",
         action_type="investigate",
         read_only=True,
         verbose="If the <b>limit</b> parameter is not specified, the action will use 200.",
         summary_type=RdataNameLookupSummary,
-        view_handler=display_rdata_name_lookup,
-        view_template="dnsdb_lookup_info.html",
-    )
-    app.register_action(
-        action=lookup_rdata_ip,
+        view_handler=display_lookup_info,
+    )(lookup_rdata_name)
+    app.action(
+        name="rdata ip lookup",
         description="Performs IP RDATA Lookup",
         action_type="investigate",
         read_only=True,
         verbose="If the <b>limit</b> parameter is not specified, the action will use 200.",
         summary_type=RdataIpLookupSummary,
-        view_handler=display_rdata_ip_lookup,
-        view_template="dnsdb_lookup_info.html",
-    )
-    app.register_action(
-        action=lookup_rdata_raw,
+        view_handler=display_lookup_info,
+    )(lookup_rdata_ip)
+    app.action(
+        name="rdata raw lookup",
         description="Lookup raw RDATA",
         action_type="investigate",
         read_only=True,
         verbose="If the <b>limit</b> parameter is not specified, the action will use 200.",
         summary_type=RdataRawLookupSummary,
-        view_handler=display_rdata_raw_lookup,
-        view_template="dnsdb_lookup_info.html",
-    )
-    app.register_action(
-        action=lookup_rrset,
+        view_handler=display_lookup_info,
+    )(lookup_rdata_raw)
+    app.action(
+        name="rrset lookup",
         description="Perform a DNSDB RRSET lookup",
         action_type="investigate",
         read_only=True,
         verbose="If the <b>limit</b> parameter is not specified, the action will use 200.",
         summary_type=RrsetLookupSummary,
-        view_handler=display_rrset_lookup,
-        view_template="dnsdb_lookup_info.html",
-    )
-    app.register_action(
-        action=flex_search,
+        view_handler=display_lookup_info,
+    )(lookup_rrset)
+    app.action(
+        name="flex search",
         description="Perform a Flex search",
         action_type="investigate",
         read_only=True,
         verbose="If the <b>limit</b> parameter is not specified, the action will use default value as 10000.",
         summary_type=FlexSearchSummary,
-        view_handler=display_flex_search,
-        view_template="dnsdb_lookup_info.html",
-    )
+        view_handler=display_lookup_info,
+    )(flex_search)
     return app

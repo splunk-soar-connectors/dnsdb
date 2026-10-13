@@ -11,11 +11,13 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 
+import itertools
+from collections.abc import Iterator
 from typing import Any, ClassVar
 
 from pydantic.functional_validators import field_validator
 from soar_sdk.abstract import SOARClient
-from soar_sdk.action_results import ActionOutput, OutputField
+from soar_sdk.action_results import ActionOutput, OutputField, OutputFieldSpecification
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
@@ -34,7 +36,7 @@ from ..dnsdb_consts import (
     DNSDB_VALUE_LIST_VALIDATION_MESSAGE,
 )
 from ..outputs import PassthroughOutput
-from ..views import build_flex_view
+from .lookup_rrset import RdataOutput
 
 
 class FlexSearchParams(Params):
@@ -106,14 +108,20 @@ class FlexSearchOutput(PassthroughOutput):
     zone_time_first: int | None = OutputField(example_values=[1566085287])
     raw_rdata: str | None = OutputField(example_values=["0366736902696f00"])
 
+    @classmethod
+    def _to_json_schema(
+        cls,
+        parent_datapath: str = "action_result.data.*",
+        column_order_counter: itertools.count | None = None,
+    ) -> Iterator[OutputFieldSpecification]:
+        yield from super()._to_json_schema(parent_datapath, column_order_counter)
+        yield from RdataOutput._to_json_schema(
+            f"{parent_datapath}.rdata.*", column_order_counter
+        )
+
 
 class FlexSearchSummary(ActionOutput):
     total_items: int | None = None
-
-
-def display_flex_search(outputs: list[FlexSearchOutput]) -> dict:
-    rows = [o.model_dump() for o in outputs]
-    return build_flex_view(rows)
 
 
 def flex_search(

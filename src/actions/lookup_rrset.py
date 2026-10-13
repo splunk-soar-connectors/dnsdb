@@ -30,6 +30,7 @@ from ..dnsdb_client import (
     format_unknown_error,
     get_client,
     map_known_dnsdb_error,
+    validate_domain,
     validate_integer,
     validate_time_params,
 )
@@ -40,7 +41,6 @@ from ..dnsdb_consts import (
     DNSDB_VALUE_LIST_VALIDATION_MESSAGE,
 )
 from ..outputs import PassthroughOutput
-from ..views import build_rrset_view
 
 _SOA_FIELDS = (
     "rdata_origin",
@@ -78,13 +78,6 @@ class RrsetLookupParams(Params):
     bailiwick: str | None = Param(description="Bailiwick")
     limit: int | None = Param(description="Max records to return", default=200)
 
-    # TODO: domain validator on hold pending team decision. Legacy never enforced it (dead code).
-    # To re-enable, restore `validate_domain` in the ..dnsdb_client import and uncomment below.
-    # @field_validator("owner_name")
-    # @classmethod
-    # def _validate_owner_name(cls, value: str) -> str:
-    #     return validate_domain(value)  # noqa: ERA001
-
     @field_validator("type")
     @classmethod
     def _validate_type(cls, value: str | None) -> str | None:
@@ -103,11 +96,7 @@ class RrsetLookupParams(Params):
 
 
 class RdataOutput(ActionOutput):
-    """Nested SOA/MX fields. Declared so the manifest documents the same paths as legacy.
-
-    At runtime RrsetLookupOutput is permissive and returns the raw rdata (plain strings for
-    most record types, these dicts for SOA/MX), so this model only shapes the manifest.
-    """
+    """Nested SOA/MX fields, declared only to document the manifest paths."""
 
     rdata_origin: str | None = OutputField(
         cef_types=["host name"], example_values=["fsi.io."]
@@ -149,7 +138,6 @@ class RrsetLookupOutput(PassthroughOutput):
         parent_datapath: str = "action_result.data.*",
         column_order_counter: itertools.count | None = None,
     ) -> Iterator[OutputFieldSpecification]:
-        """Declare the plain `rdata` path (from the base) plus the nested SOA/MX paths, as legacy did."""
         yield from super()._to_json_schema(parent_datapath, column_order_counter)
         yield from RdataOutput._to_json_schema(
             f"{parent_datapath}.rdata.*", column_order_counter
@@ -158,11 +146,6 @@ class RrsetLookupOutput(PassthroughOutput):
 
 class RrsetLookupSummary(ActionOutput):
     total_items: int | None = None
-
-
-def display_rrset_lookup(outputs: list[RrsetLookupOutput]) -> dict:
-    rows = [o.model_dump() for o in outputs]
-    return build_rrset_view(rows)
 
 
 def _split_rdata(rrtype: str, raw_rdata: list[str]) -> list[dict | str]:
@@ -182,6 +165,8 @@ def _split_rdata(rrtype: str, raw_rdata: list[str]) -> list[dict | str]:
 def lookup_rrset(
     params: RrsetLookupParams, soar: SOARClient, asset: Asset
 ) -> list[RrsetLookupOutput]:
+    validate_domain(params.owner_name, "owner_name")
+
     record_type = params.type or "ANY"
 
     time_first_before, time_first_after, time_last_before, time_last_after = (

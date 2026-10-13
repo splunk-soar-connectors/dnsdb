@@ -16,22 +16,21 @@ from soar_sdk.exceptions import ActionFailure
 from soar_sdk.logging import getLogger
 
 from .asset import Asset
-from .dnsdb_client import get_client, map_known_dnsdb_error
+from .dnsdb_client import format_unknown_error, get_client, map_known_dnsdb_error
 from .dnsdb_consts import DNSDB_TEST_CONNECTIVITY_FAIL, DNSDB_TEST_CONNECTIVITY_MESSAGE
 
 logger = getLogger()
 
 
-def run_test_connectivity(soar: SOARClient, asset: Asset) -> None:
+def fetch_rate_limit(asset: Asset) -> dict:
     logger.progress(DNSDB_TEST_CONNECTIVITY_MESSAGE)
-
     try:
         rate = get_client(asset).rate_limit()["rate"]
     except Exception as error:
         known = map_known_dnsdb_error(error)
         if known is not None:
             raise known from error
-        logger.debug(str(error))
+        logger.debug(format_unknown_error(error))
         raise ActionFailure(DNSDB_TEST_CONNECTIVITY_FAIL) from error
 
     logger.progress(
@@ -40,4 +39,9 @@ def run_test_connectivity(soar: SOARClient, asset: Asset) -> None:
         rate.get("remaining"),
         rate.get("reset"),
     )
+    return rate
+
+
+def run_test_connectivity(soar: SOARClient, asset: Asset) -> None:
+    fetch_rate_limit(asset)
     soar.set_message("Rate limit details fetched successfully")

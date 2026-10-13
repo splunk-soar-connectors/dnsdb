@@ -11,13 +11,15 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 
+import itertools
+from collections.abc import Iterator
+
 from soar_sdk.abstract import SOARClient
-from soar_sdk.action_results import ActionOutput, OutputField
-from soar_sdk.exceptions import ActionFailure
+from soar_sdk.action_results import ActionOutput, OutputField, OutputFieldSpecification
 from soar_sdk.params import Params
 
 from ..asset import Asset
-from ..dnsdb_client import get_client, map_known_dnsdb_error
+from ..test_connectivity import fetch_rate_limit
 
 
 class CheckRateLimitOutput(ActionOutput):
@@ -28,20 +30,19 @@ class CheckRateLimitOutput(ActionOutput):
     results_max: int = OutputField(example_values=[1000000])
 
 
-def display_rate_limit(outputs: list[CheckRateLimitOutput]) -> dict:
-    return {"results": [{"data": [o.model_dump() for o in outputs]}]}
+class CheckRateLimitSummary(ActionOutput):
+    @classmethod
+    def _to_json_schema(
+        cls,
+        parent_datapath: str = "action_result.summary",
+        column_order_counter: itertools.count | None = None,
+    ) -> Iterator[OutputFieldSpecification]:
+        yield OutputFieldSpecification(data_path=parent_datapath, data_type="string")
 
 
 def check_rate_limit(
     params: Params, soar: SOARClient, asset: Asset
 ) -> CheckRateLimitOutput:
-    try:
-        rate = get_client(asset).rate_limit()["rate"]
-    except Exception as error:
-        known = map_known_dnsdb_error(error)
-        if known is not None:
-            raise known from error
-        raise ActionFailure(str(error)) from error
-
+    rate = fetch_rate_limit(asset)
     soar.set_message("Rate limit details fetched successfully")
     return CheckRateLimitOutput(**rate)

@@ -33,7 +33,6 @@ from ..dnsdb_consts import (
     DNSDB_INVALID_NETWORK_PREFIX,
 )
 from ..outputs import PassthroughOutput
-from ..views import build_rdata_lookup_view
 
 
 class RdataIpLookupParams(Params):
@@ -78,11 +77,6 @@ class RdataIpLookupOutput(PassthroughOutput):
 
 class RdataIpLookupSummary(ActionOutput):
     total_domains: int | None = None
-
-
-def display_rdata_ip_lookup(outputs: list[RdataIpLookupOutput]) -> dict:
-    rows = [o.model_dump() for o in outputs]
-    return build_rdata_lookup_view(rows, table_title="RDATA Lookup")
 
 
 def lookup_rdata_ip(
