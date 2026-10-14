@@ -65,7 +65,12 @@ def http_action(params: DnsdbMakeRequestParams, asset: Asset) -> DnsdbMakeReques
             raise ActionFailure("The 'headers' parameter must be valid JSON") from e
         if not isinstance(user_headers, dict):
             raise ActionFailure("The 'headers' parameter must be a JSON object")
-        headers = {**user_headers, DNSDB_API_KEY_HEADER: asset.api_key}
+        headers = {
+            name: value
+            for name, value in user_headers.items()
+            if name.lower() != DNSDB_API_KEY_HEADER.lower()
+        }
+        headers[DNSDB_API_KEY_HEADER] = asset.api_key
 
     query_params = None
     if params.query_parameters:

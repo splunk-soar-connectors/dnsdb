@@ -46,7 +46,7 @@ def _parse_data(data, param):
                 res["raw"][rt] = list(res["raw"][rt])
     elif "owner_name" in param or ("type" in param and param["type"] == "RRSET"):
         res["domain"] = {}
-        rrtype = param.get("type", "ANY")
+        rrtype = param.get("type") or "ANY"
         rrtypes = set(map(lambda x: x["rrtype"], data))
 
         if rrtype in ("ANY", "ANY-DNSSEC"):
