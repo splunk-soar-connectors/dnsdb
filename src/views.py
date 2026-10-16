@@ -1,5 +1,3 @@
-# File: dnsdb_view.py
-#
 # Copyright (c) 2016-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,16 +13,14 @@
 def _parse_data(data, param):
     res = {}
 
-    # parsing data for flex search action
-    if "query" in param.keys():
+    if "query" in param:
         res["flex"] = {}
         rrtypes = set(map(lambda x: x["rrtype"], data))
         for curr_rrtype in rrtypes:
             res["flex"][curr_rrtype] = []
         for match in data:
             res["flex"][match["rrtype"]].append(match)
-    # parsing data for lookup ip action
-    elif "ip" in param.keys() or "name" in param.keys():
+    elif "ip" in param or "name" in param:
         res["response"] = {}
         res["response"] = data
         res["ip"] = {}
@@ -36,8 +32,7 @@ def _parse_data(data, param):
         for rt in res["ip"]:
             if isinstance(res["ip"][rt], set):
                 res["ip"][rt] = list(res["ip"][rt])
-    # parsing data for lookup raw rdata action
-    elif "raw_rdata" in param.keys():
+    elif "raw_rdata" in param:
         res["response"] = {}
         res["response"] = data
         res["raw"] = {}
@@ -49,13 +44,11 @@ def _parse_data(data, param):
         for rt in res["raw"]:
             if isinstance(res["raw"][rt], set):
                 res["raw"][rt] = list(res["raw"][rt])
-    # parsing data for lookup domain action
-    elif "owner_name" in param.keys() or ("type" in param.keys() and param["type"] == "RRSET"):
+    elif "owner_name" in param or ("type" in param and param["type"] == "RRSET"):
         res["domain"] = {}
-        rrtype = param.get("type", "ANY")
+        rrtype = param.get("type") or "ANY"
         rrtypes = set(map(lambda x: x["rrtype"], data))
 
-        # if data contains multiple record types
         if rrtype in ("ANY", "ANY-DNSSEC"):
             for curr_rrtype in rrtypes:
                 if curr_rrtype in ["SOA", "MX"]:
@@ -63,7 +56,6 @@ def _parse_data(data, param):
                 else:
                     res["domain"][curr_rrtype] = set()
 
-        # if specific record type selected
         elif rrtype in ["SOA", "MX"]:
             res["domain"][rrtype] = []
         else:
@@ -71,14 +63,22 @@ def _parse_data(data, param):
 
         for rrset in data:
             if rrset["rrtype"] in ["SOA", "MX"]:
-                res["domain"][rrset["rrtype"]] = res["domain"][rrset["rrtype"]] + rrset["rdata"]
+                res["domain"][rrset["rrtype"]] = (
+                    res["domain"][rrset["rrtype"]] + rrset["rdata"]
+                )
             else:
-                res["domain"][rrset["rrtype"]] = res["domain"][rrset["rrtype"]].union(rrset["rdata"])
+                res["domain"][rrset["rrtype"]] = res["domain"][rrset["rrtype"]].union(
+                    rrset["rdata"]
+                )
 
         if "SOA" in res["domain"]:
-            res["domain"]["SOA"] = [dict(s) for s in set(frozenset(d.items()) for d in res["domain"]["SOA"])]
+            res["domain"]["SOA"] = [
+                dict(s) for s in set(frozenset(d.items()) for d in res["domain"]["SOA"])
+            ]
         if "MX" in res["domain"]:
-            res["domain"]["MX"] = [dict(s) for s in set(frozenset(d.items()) for d in res["domain"]["MX"])]
+            res["domain"]["MX"] = [
+                dict(s) for s in set(frozenset(d.items()) for d in res["domain"]["MX"])
+            ]
 
         for rt in res["domain"]:
             if isinstance(res["domain"][rt], set):
@@ -110,33 +110,11 @@ def _get_ctx_result(result):
 
 def display_lookup_info(provides, all_app_runs, context):
     context["results"] = results = []
-    for summary, action_results in all_app_runs:
+    for _summary, action_results in all_app_runs:
         for result in action_results:
             ctx_result = _get_ctx_result(result)
             if not ctx_result:
                 continue
             results.append(ctx_result)
 
-    return "dnsdb_lookup_info.html"
-
-
-def show_rate_limits(provides, all_app_runs, context):
-    context["results"] = results = []
-    for summary, action_results in all_app_runs:
-        for result in action_results:
-            param = result.get_param()
-            summary = result.get_summary()
-            data = result.get_data()
-            ctx_result = {}
-
-            ctx_result["param"] = param
-            if summary:
-                ctx_result["summary"] = summary
-
-            if not data:
-                ctx_result["data"] = {}
-            else:
-                ctx_result["data"] = data
-            results.append(ctx_result)
-
-    return "dnsdb_rate_limits.html"
+    return "templates/dnsdb_lookup_info.html"
