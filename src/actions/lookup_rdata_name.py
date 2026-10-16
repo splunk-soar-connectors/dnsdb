@@ -17,7 +17,7 @@ from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
-from ..dnsdb_client import (
+from ..helpers import (
     format_unknown_error,
     get_client,
     map_known_dnsdb_error,

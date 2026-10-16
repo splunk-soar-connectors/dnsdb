@@ -289,8 +289,8 @@ action_result.parameter.query_parameters | string | | |
 action_result.parameter.body | string | | |
 action_result.parameter.timeout | numeric | | |
 action_result.parameter.verify_ssl | boolean | | |
-action_result.data.\*.status_code | numeric | | 200 |
-action_result.data.\*.response_body | string | | {} |
+action_result.data.\*.status_code | numeric | | 200 404 500 |
+action_result.data.\*.response_body | string | | {"key": "value"} |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
@@ -311,9 +311,9 @@ DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.status | string | | success failure |
 action_result.message | string | | |
-action_result.data.\*.reset | numeric | | 1618617600 |
-action_result.data.\*.remaining | numeric | | 992 |
 action_result.data.\*.limit | numeric | | 1000 |
+action_result.data.\*.remaining | numeric | | 992 |
+action_result.data.\*.reset | numeric | | 1618617600 |
 action_result.data.\*.offset_max | numeric | | 3000000 |
 action_result.data.\*.results_max | numeric | | 1000000 |
 summary.total_objects | numeric | | 1 |
@@ -497,7 +497,7 @@ action_result.data.\*.time_last | numeric | | 1566085287 |
 action_result.data.\*.time_first | numeric | | 1566085287 |
 action_result.data.\*.zone_time_last | numeric | | 1566085287 |
 action_result.data.\*.zone_time_first | numeric | | 1566085287 |
-action_result.data.\*.rdata | string | `ip` `dnsdb ipv6` `domain` | 66.160.140.81 |
+action_result.data.\*.rdata.\* | string | `ip` `dnsdb ipv6` `domain` | 66.160.140.81 |
 action_result.data.\*.rdata.\*.rdata_origin | string | `host name` | fsi.io. |
 action_result.data.\*.rdata.\*.rdata_mail_addr | string | `email` | hostmaster.fsi.io |
 action_result.data.\*.rdata.\*.rdata_serial | string | | 2015040254 |

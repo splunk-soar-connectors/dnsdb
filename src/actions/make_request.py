@@ -14,7 +14,7 @@
 import json
 
 import httpx
-from soar_sdk.action_results import ActionOutput, OutputField
+from soar_sdk.action_results import MakeRequestOutput
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import MakeRequestParams, Param
 
@@ -37,16 +37,7 @@ class DnsdbMakeRequestParams(MakeRequestParams):
     )
 
 
-class DnsdbMakeRequestOutput(ActionOutput):
-    status_code: int = OutputField(example_values=[200])
-    response_body: str = OutputField(example_values=["{}"])
-
-    @classmethod
-    def from_response(cls, response: httpx.Response) -> "DnsdbMakeRequestOutput":
-        return cls(status_code=response.status_code, response_body=response.text)
-
-
-def http_action(params: DnsdbMakeRequestParams, asset: Asset) -> DnsdbMakeRequestOutput:
+def http_action(params: DnsdbMakeRequestParams, asset: Asset) -> MakeRequestOutput:
     """Make an authenticated request to the DNSDB API."""
     if params.endpoint.startswith(("http://", "https://")):
         raise ActionFailure(
@@ -110,4 +101,6 @@ def http_action(params: DnsdbMakeRequestParams, asset: Asset) -> DnsdbMakeReques
     except httpx.HTTPError as error:
         raise ActionFailure(f"Request failed: {error}") from None
 
-    return DnsdbMakeRequestOutput.from_response(response)
+    return MakeRequestOutput(
+        status_code=response.status_code, response_body=response.text
+    )

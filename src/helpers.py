@@ -91,7 +91,6 @@ def format_unknown_error(error: Exception) -> str:
 
 
 def validate_integer(value: Any, key: str) -> int | None:
-    """Validate an integer parameter with the legacy messages."""
     if value is None:
         return None
 
@@ -107,8 +106,11 @@ def validate_integer(value: Any, key: str) -> int | None:
     return number
 
 
-def validate_value_list(value: str | None, allowed: list[str], key: str) -> None:
-    if value and value not in allowed:
+def validate_value_list(
+    value: str | None, allowed: list[str], key: str, *, required: bool = False
+) -> None:
+    """Optional values may be empty; required ones must be in the allowed list."""
+    if (required or value) and value not in allowed:
         raise ActionFailure(
             DNSDB_VALUE_LIST_VALIDATION_MESSAGE.format(value_list=allowed, key=key)
         )

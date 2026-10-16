@@ -118,25 +118,3 @@ def display_lookup_info(provides, all_app_runs, context):
             results.append(ctx_result)
 
     return "templates/dnsdb_lookup_info.html"
-
-
-def show_rate_limits(provides, all_app_runs, context):
-    context["results"] = results = []
-    for _summary, action_results in all_app_runs:
-        for result in action_results:
-            param = result.get_param()
-            result_summary = result.get_summary()
-            data = result.get_data()
-            ctx_result = {}
-
-            ctx_result["param"] = param
-            if result_summary:
-                ctx_result["summary"] = result_summary
-
-            if not data:
-                ctx_result["data"] = {}
-            else:
-                ctx_result["data"] = data
-            results.append(ctx_result)
-
-    return "templates/dnsdb_rate_limits.html"

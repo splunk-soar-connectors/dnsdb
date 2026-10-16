@@ -20,11 +20,19 @@ from ..test_connectivity import fetch_rate_limit
 
 
 class CheckRateLimitOutput(PermissiveActionOutput):
-    reset: int | None = OutputField(example_values=[1618617600])
-    remaining: int | None = OutputField(example_values=[992])
-    limit: int | None = OutputField(example_values=[1000])
-    offset_max: int | None = OutputField(example_values=[3000000])
-    results_max: int | None = OutputField(example_values=[1000000])
+    limit: int | None = OutputField(example_values=[1000], column_name="Query quota")
+    remaining: int | None = OutputField(
+        example_values=[992], column_name="Queries remaining"
+    )
+    reset: int | None = OutputField(
+        example_values=[1618617600], column_name="Limit reset time"
+    )
+    offset_max: int | None = OutputField(
+        example_values=[3000000], column_name="Offset max"
+    )
+    results_max: int | None = OutputField(
+        example_values=[1000000], column_name="Results max"
+    )
 
 
 def check_rate_limit(

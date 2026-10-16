@@ -16,7 +16,7 @@ from soar_sdk.exceptions import ActionFailure
 from soar_sdk.logging import getLogger
 
 from .asset import Asset
-from .dnsdb_client import format_unknown_error, get_client, map_known_dnsdb_error
+from .helpers import format_unknown_error, get_client, map_known_dnsdb_error
 from .dnsdb_consts import DNSDB_TEST_CONNECTIVITY_FAIL, DNSDB_TEST_CONNECTIVITY_MESSAGE
 
 logger = getLogger()

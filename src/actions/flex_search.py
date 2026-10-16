@@ -17,7 +17,7 @@ from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
-from ..dnsdb_client import (
+from ..helpers import (
     format_unknown_error,
     get_client,
     map_known_dnsdb_error,
@@ -82,9 +82,12 @@ class FlexSearchSummary(ActionOutput):
 def flex_search(
     params: FlexSearchParams, soar: SOARClient, asset: Asset
 ) -> list[FlexSearchOutput]:
-    validate_value_list(params.type, DNSDB_FLEX_TYPE_VALUE_LIST, "type")
+    validate_value_list(params.type, DNSDB_FLEX_TYPE_VALUE_LIST, "type", required=True)
     validate_value_list(
-        params.search_type, DNSDB_FLEX_SEARCH_TYPE_VALUE_LIST, "search_type"
+        params.search_type,
+        DNSDB_FLEX_SEARCH_TYPE_VALUE_LIST,
+        "search_type",
+        required=True,
     )
     limit = validate_integer(params.limit, "limit")
 

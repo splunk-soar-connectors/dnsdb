@@ -13,7 +13,7 @@
 
 from soar_sdk.app import App
 
-from ..views import display_lookup_info, show_rate_limits
+from ..views import display_lookup_info
 from .check_rate_limit import check_rate_limit
 from .flex_search import FlexSearchSummary, flex_search
 from .lookup_rdata_ip import RdataIpLookupSummary, lookup_rdata_ip
@@ -29,7 +29,7 @@ def register_actions(app: App) -> App:
         description="Get data of current data limit",
         action_type="investigate",
         read_only=True,
-        view_handler=show_rate_limits,
+        render_as="table",
     )(check_rate_limit)
     app.action(
         name="rdata name lookup",

@@ -24,7 +24,7 @@ from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
-from ..dnsdb_client import (
+from ..helpers import (
     format_unknown_error,
     get_client,
     map_known_dnsdb_error,
@@ -116,10 +116,10 @@ class RrsetLookupOutput(PermissiveActionOutput):
         parent_datapath: str = "action_result.data.*",
         column_order_counter: itertools.count | None = None,
     ) -> Iterator[OutputFieldSpecification]:
-        # rdata mixes plain strings and SOA/MX objects, which one field type can't declare
+        # rdata is a list of strings or SOA/MX objects; the SDK can't declare that union
         yield from super()._to_json_schema(parent_datapath, column_order_counter)
         yield OutputFieldSpecification(
-            data_path=f"{parent_datapath}.rdata",
+            data_path=f"{parent_datapath}.rdata.*",
             data_type="string",
             contains=["ip", "dnsdb ipv6", "domain"],
             example_values=["66.160.140.81"],
