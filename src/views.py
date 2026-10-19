@@ -10,111 +10,84 @@
 # the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
-def _parse_data(data, param):
-    res = {}
 
-    if "query" in param:
-        res["flex"] = {}
-        rrtypes = set(map(lambda x: x["rrtype"], data))
-        for curr_rrtype in rrtypes:
-            res["flex"][curr_rrtype] = []
-        for match in data:
-            res["flex"][match["rrtype"]].append(match)
-    elif "ip" in param or "name" in param:
-        res["response"] = {}
-        res["response"] = data
-        res["ip"] = {}
-        res["ip"]["domains"] = set()
-        for rdata in data:
-            if rdata["rrname"]:
-                res["ip"]["domains"].add(rdata["rrname"])
+from soar_sdk.action_results import ActionOutput
+from soar_sdk.models.view import ViewContext
 
-        for rt in res["ip"]:
-            if isinstance(res["ip"][rt], set):
-                res["ip"][rt] = list(res["ip"][rt])
-    elif "raw_rdata" in param:
-        res["response"] = {}
-        res["response"] = data
-        res["raw"] = {}
-        res["raw"]["domains"] = set()
-        for rdata in data:
-            if rdata["rrname"]:
-                res["raw"]["domains"].add(rdata["rrname"])
-
-        for rt in res["raw"]:
-            if isinstance(res["raw"][rt], set):
-                res["raw"][rt] = list(res["raw"][rt])
-    elif "owner_name" in param or ("type" in param and param["type"] == "RRSET"):
-        res["domain"] = {}
-        rrtype = param.get("type") or "ANY"
-        rrtypes = set(map(lambda x: x["rrtype"], data))
-
-        if rrtype in ("ANY", "ANY-DNSSEC"):
-            for curr_rrtype in rrtypes:
-                if curr_rrtype in ["SOA", "MX"]:
-                    res["domain"][curr_rrtype] = []
-                else:
-                    res["domain"][curr_rrtype] = set()
-
-        elif rrtype in ["SOA", "MX"]:
-            res["domain"][rrtype] = []
-        else:
-            res["domain"][rrtype] = set()
-
-        for rrset in data:
-            if rrset["rrtype"] in ["SOA", "MX"]:
-                res["domain"][rrset["rrtype"]] = (
-                    res["domain"][rrset["rrtype"]] + rrset["rdata"]
-                )
-            else:
-                res["domain"][rrset["rrtype"]] = res["domain"][rrset["rrtype"]].union(
-                    rrset["rdata"]
-                )
-
-        if "SOA" in res["domain"]:
-            res["domain"]["SOA"] = [
-                dict(s) for s in set(frozenset(d.items()) for d in res["domain"]["SOA"])
-            ]
-        if "MX" in res["domain"]:
-            res["domain"]["MX"] = [
-                dict(s) for s in set(frozenset(d.items()) for d in res["domain"]["MX"])
-            ]
-
-        for rt in res["domain"]:
-            if isinstance(res["domain"][rt], set):
-                res["domain"][rt] = list(res["domain"][rt])
-
-    return res
+from .actions.flex_search import FlexSearchOutput
+from .actions.lookup_rdata_ip import RdataIpLookupOutput
+from .actions.lookup_rdata_name import RdataNameLookupOutput
+from .actions.lookup_rdata_raw import RdataRawLookupOutput
+from .actions.lookup_rrset import RrsetLookupOutput
 
 
-def _get_ctx_result(result):
-    ctx_result = {}
-
-    param = result.get_param()
-    summary = result.get_summary()
-    data = result.get_data()
-
-    ctx_result["param"] = param
-    if summary:
-        ctx_result["summary"] = summary
-
-    if not data:
-        ctx_result["data"] = {}
-        return ctx_result
-
-    data = _parse_data(data, ctx_result["param"])
-
-    ctx_result["data"] = data
-    return ctx_result
+def _rows(outputs: list[ActionOutput]) -> list[dict]:
+    return [output.model_dump() for output in outputs]
 
 
-def display_lookup_info(provides, all_app_runs, context):
-    context["results"] = results = []
-    for _summary, action_results in all_app_runs:
-        for result in action_results:
-            ctx_result = _get_ctx_result(result)
-            if not ctx_result:
-                continue
-            results.append(ctx_result)
+def _rdata_lookup_view(context: ViewContext, kind: str, outputs: list) -> dict:
+    rows = _rows(outputs)
+    domains = sorted({row["rrname"] for row in rows if row.get("rrname")})
+    result = {"kind": kind, "rows": rows, "domains": domains, "total": len(domains)}
+    return {"container_id": context.container, "results": [result]}
 
-    return "templates/dnsdb_lookup_info.html"
+
+def display_rdata_name_lookup(
+    context: ViewContext, outputs: list[RdataNameLookupOutput]
+) -> dict:
+    return _rdata_lookup_view(context, "rdata_name", outputs)
+
+
+def display_rdata_ip_lookup(
+    context: ViewContext, outputs: list[RdataIpLookupOutput]
+) -> dict:
+    return _rdata_lookup_view(context, "rdata_ip", outputs)
+
+
+def display_rdata_raw_lookup(
+    context: ViewContext, outputs: list[RdataRawLookupOutput]
+) -> dict:
+    return _rdata_lookup_view(context, "rdata_raw", outputs)
+
+
+def display_rrset_lookup(
+    context: ViewContext, outputs: list[RrsetLookupOutput]
+) -> dict:
+    rows = _rows(outputs)
+    groups: dict[str, list] = {}
+    for row in rows:
+        rrtype = row.get("rrtype")
+        if not rrtype:
+            continue
+        entries = groups.setdefault(rrtype, [])
+        for item in row.get("rdata") or []:
+            if item not in entries:
+                entries.append(item)
+
+    result = {
+        "kind": "rrset",
+        "rows": rows,
+        "groups": [{"rrtype": rrtype, "entries": e} for rrtype, e in groups.items()],
+        "total": len(rows),
+    }
+    return {"container_id": context.container, "results": [result]}
+
+
+def display_flex_search(context: ViewContext, outputs: list[FlexSearchOutput]) -> dict:
+    rows = _rows(outputs)
+    groups: dict[str, dict] = {}
+    for row in rows:
+        group = groups.setdefault(
+            row.get("rrtype") or "UNKNOWN", {"rows": [], "is_rdata": False}
+        )
+        group["rows"].append(row)
+        if row.get("rdata") or row.get("raw_rdata"):
+            group["is_rdata"] = True
+
+    result = {
+        "kind": "flex",
+        "rows": rows,
+        "groups": [{"rrtype": rrtype, **group} for rrtype, group in groups.items()],
+        "total": len(rows),
+    }
+    return {"container_id": context.container, "results": [result]}

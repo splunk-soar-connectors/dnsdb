@@ -21,7 +21,6 @@ from typing import Any
 
 import dnsdb2
 from soar_sdk.exceptions import ActionFailure
-from soar_sdk.logging import getLogger
 
 from .asset import Asset
 from .dnsdb_consts import (
@@ -40,9 +39,6 @@ from .dnsdb_consts import (
 )
 
 
-logger = getLogger()
-
-
 def get_client(asset: Asset) -> dnsdb2.Client:
     return dnsdb2.Client(asset.api_key)
 
@@ -55,22 +51,8 @@ def map_known_dnsdb_error(error: Exception) -> ActionFailure | None:
     return None
 
 
-def log_unknown_error(error: Exception) -> None:
-    """Debug-log the HTTP status and body that dnsdb2 drops from its exception."""
-    cause = error.__cause__
-    response = getattr(cause, "response", None)
-    logger.debug(
-        f"Unexpected DNSDB error: {type(error).__name__}{error.args!r}; cause={cause!r}; "
-        f"http_status={getattr(response, 'status_code', None)}; "
-        f"body={(getattr(response, 'text', '') or '')[:500]}"
-    )
-
-
 def format_unknown_error(error: Exception) -> str:
     """Format an unexpected exception like the legacy connector."""
-    with contextlib.suppress(Exception):
-        log_unknown_error(error)
-
     error_code: Any = DNSDB_ERROR_CODE_MESSAGE
     error_message: Any = DNSDB_ERROR_MESSAGE_UNAVAILABLE
     with contextlib.suppress(Exception):

@@ -13,7 +13,6 @@
 
 from soar_sdk.app import App
 
-from ..views import display_lookup_info
 from .check_rate_limit import check_rate_limit
 from .flex_search import FlexSearchSummary, flex_search
 from .lookup_rdata_ip import RdataIpLookupSummary, lookup_rdata_ip
@@ -21,6 +20,15 @@ from .lookup_rdata_name import RdataNameLookupSummary, lookup_rdata_name
 from .lookup_rdata_raw import RdataRawLookupSummary, lookup_rdata_raw
 from .lookup_rrset import RrsetLookupSummary, lookup_rrset
 from .make_request import http_action
+from ..views import (
+    display_flex_search,
+    display_rdata_ip_lookup,
+    display_rdata_name_lookup,
+    display_rdata_raw_lookup,
+    display_rrset_lookup,
+)
+
+LOOKUP_VIEW_TEMPLATE = "dnsdb_lookup_info.html"
 
 
 def register_actions(app: App) -> App:
@@ -31,49 +39,59 @@ def register_actions(app: App) -> App:
         read_only=True,
         render_as="table",
     )(check_rate_limit)
-    app.action(
+    app.register_action(
+        action=lookup_rdata_name,
         name="rdata name lookup",
         description="Performs Name RDATA Lookup",
         action_type="investigate",
         read_only=True,
         verbose="If the <b>limit</b> parameter is not specified, the action will use 200.",
         summary_type=RdataNameLookupSummary,
-        view_handler=display_lookup_info,
-    )(lookup_rdata_name)
-    app.action(
+        view_handler=display_rdata_name_lookup,
+        view_template=LOOKUP_VIEW_TEMPLATE,
+    )
+    app.register_action(
+        action=lookup_rdata_ip,
         name="rdata ip lookup",
         description="Performs IP RDATA Lookup",
         action_type="investigate",
         read_only=True,
         verbose="If the <b>limit</b> parameter is not specified, the action will use 200.",
         summary_type=RdataIpLookupSummary,
-        view_handler=display_lookup_info,
-    )(lookup_rdata_ip)
-    app.action(
+        view_handler=display_rdata_ip_lookup,
+        view_template=LOOKUP_VIEW_TEMPLATE,
+    )
+    app.register_action(
+        action=lookup_rdata_raw,
         name="rdata raw lookup",
         description="Lookup raw RDATA",
         action_type="investigate",
         read_only=True,
         verbose="If the <b>limit</b> parameter is not specified, the action will use 200.",
         summary_type=RdataRawLookupSummary,
-        view_handler=display_lookup_info,
-    )(lookup_rdata_raw)
-    app.action(
+        view_handler=display_rdata_raw_lookup,
+        view_template=LOOKUP_VIEW_TEMPLATE,
+    )
+    app.register_action(
+        action=lookup_rrset,
         name="rrset lookup",
         description="Perform a DNSDB RRSET lookup",
         action_type="investigate",
         read_only=True,
         verbose="If the <b>limit</b> parameter is not specified, the action will use 200.",
         summary_type=RrsetLookupSummary,
-        view_handler=display_lookup_info,
-    )(lookup_rrset)
-    app.action(
+        view_handler=display_rrset_lookup,
+        view_template=LOOKUP_VIEW_TEMPLATE,
+    )
+    app.register_action(
+        action=flex_search,
         name="flex search",
         description="Perform a Flex search",
         action_type="investigate",
         read_only=True,
         verbose="If the <b>limit</b> parameter is not specified, the action will use default value as 10000.",
         summary_type=FlexSearchSummary,
-        view_handler=display_lookup_info,
-    )(flex_search)
+        view_handler=display_flex_search,
+        view_template=LOOKUP_VIEW_TEMPLATE,
+    )
     return app
