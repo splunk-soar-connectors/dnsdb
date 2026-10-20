@@ -74,7 +74,7 @@ def lookup_rdata_ip(
     params: RdataIpLookupParams, soar: SOARClient, asset: Asset
 ) -> list[RdataIpLookupOutput]:
     network_prefix = validate_integer(params.network_prefix, "network_prefix")
-    limit = validate_integer(params.limit, "limit")
+    limit = validate_integer(params.limit, "limit", default=200)
 
     if network_prefix is not None:
         max_prefix = 32 if is_ipv4(params.ip) else 128

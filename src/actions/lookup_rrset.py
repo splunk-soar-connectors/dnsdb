@@ -152,7 +152,7 @@ def lookup_rrset(
 ) -> list[RrsetLookupOutput]:
     validate_domain(params.owner_name, "owner_name")
     validate_value_list(params.type, DNSDB_LOOKUP_TYPE_VALUE_LIST, "type")
-    limit = validate_integer(params.limit, "limit")
+    limit = validate_integer(params.limit, "limit", default=200)
 
     record_type = params.type or "ANY"
 

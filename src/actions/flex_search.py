@@ -89,7 +89,7 @@ def flex_search(
         "search_type",
         required=True,
     )
-    limit = validate_integer(params.limit, "limit")
+    limit = validate_integer(params.limit, "limit", default=10000)
 
     time_first_before, time_first_after, time_last_before, time_last_after = (
         validate_time_params(

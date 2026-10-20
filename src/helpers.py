@@ -72,9 +72,9 @@ def format_unknown_error(error: Exception) -> str:
         return DNSDB_PARSE_ERROR_MESSAGE
 
 
-def validate_integer(value: Any, key: str) -> int | None:
+def validate_integer(value: Any, key: str, default: int | None = None) -> int | None:
     if value is None:
-        return None
+        return default
 
     try:
         if not float(value).is_integer():

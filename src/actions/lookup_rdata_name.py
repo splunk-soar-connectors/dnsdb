@@ -68,7 +68,7 @@ def lookup_rdata_name(
     params: RdataNameLookupParams, soar: SOARClient, asset: Asset
 ) -> list[RdataNameLookupOutput]:
     validate_domain(params.name, "name")
-    limit = validate_integer(params.limit, "limit")
+    limit = validate_integer(params.limit, "limit", default=200)
 
     time_first_before, time_first_after, time_last_before, time_last_after = (
         validate_time_params(

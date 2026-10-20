@@ -87,7 +87,7 @@ def lookup_rdata_raw(
 ) -> list[RdataRawLookupOutput]:
     if not _HEX_RE.fullmatch(params.raw_rdata) or len(params.raw_rdata) % 2:
         raise ActionFailure(DNSDB_INVALID_HEX_RDATA)
-    limit = validate_integer(params.limit, "limit")
+    limit = validate_integer(params.limit, "limit", default=200)
     validate_value_list(params.type, DNSDB_LOOKUP_TYPE_VALUE_LIST, "type")
 
     time_first_before, time_first_after, time_last_before, time_last_after = (
