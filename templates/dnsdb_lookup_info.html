@@ -49,9 +49,10 @@
         <h4 class="wf-h2-style">No lookup information found</h4>
       {% else %}
         <h3 class="wf-h3-style">Info</h3>
+        {% set total_label = "Total domains" if result.kind in ["rdata_name", "rdata_ip", "rdata_raw"] else "Total results retrieved" %}
         <table class="wf-table-vertical">
           <tr>
-            <td>Total results retrieved</td>
+            <td>{{ total_label }}</td>
             <td>{{ result.total }}</td>
           </tr>
         </table>
