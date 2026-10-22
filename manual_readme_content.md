@@ -198,3 +198,8 @@
   - Flex Search
   - RRSET Lookup
   - RDATA Raw Lookup
+
+1. ### Make Request
+   - Sends an authenticated HTTP request to the DNSDB API (base URL
+     https://api.dnsdb.info/dnsdb/v2). The API key from the asset configuration is added
+     automatically, so only the endpoint path (for example, /rate_limit) needs to be provided.

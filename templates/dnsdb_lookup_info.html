@@ -1,0 +1,273 @@
+{#
+  Copyright (c) 2016-2026 Splunk Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software distributed under
+  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+  either express or implied. See the License for the specific language governing permissions
+  and limitations under the License.
+#}
+{% extends "widgets/widget_template.html" %}
+{% block widget_content %}
+  {% macro pivot(value, contains, cid, label=none) -%}
+    {% if value %}
+      <a href="javascript:;"
+         onclick='context_menu(this, [{"contains": {{ contains|tojson }}, "value": {{ value|tojson }}}], 0, {{ cid }}, null, false);'>
+        {{ label or value }}
+        &nbsp;
+        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+      </a>
+    {% endif %}
+  {%- endmacro %}
+  <style>
+  td { padding: 7px }
+
+  .dataTables_filter input {
+   border: 1px solid;
+  }
+  .dataTables_filter input:hover {
+   border: 1px solid;
+  }
+  .dataTables_filter input:focus {
+   border: 1px solid;
+  }
+  </style>
+  <div class="dnsdb"
+       style="overflow: auto;
+              width: 100%;
+              height: 100%;
+              padding-left:10px;
+              padding-right:10px">
+    {% for result in results %}
+      <br>
+      {% if not result.rows %}
+        <h4 class="wf-h2-style">No lookup information found</h4>
+      {% else %}
+        <h3 class="wf-h3-style">Info</h3>
+        {% set total_label = "Total domains" if result.kind in ["rdata_name", "rdata_ip", "rdata_raw"] else "Total results retrieved" %}
+        <table class="wf-table-vertical">
+          <tr>
+            <td>{{ total_label }}</td>
+            <td>{{ result.total }}</td>
+          </tr>
+        </table>
+        {% if result.kind == "flex" %}
+          <br>
+          <h3 class="wf-h3-style">Flex Search</h3>
+          <br>
+          <div class="container">
+            <span>Type: &nbsp;</span>
+            <select id="rdata_type" class="wf-table-vertical" onchange="show_table(this)">
+              {% for group in result.groups %}
+                <option value="type_{{ group.rrtype }}">{{ group.rrtype }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% for group in result.groups %}
+            <div class="wf-table-div"
+                 id="type_{{ group.rrtype }}"
+                 style="{% if not loop.first %}display:none;
+                        {% endif %}width:100%">
+              <table id="rrtype_{{ group.rrtype }}_table"
+                     class="datatable wf-table-horizontal">
+                <thead>
+                  <tr>
+                    {% if group.is_rdata %}
+                      <th>
+                        RDATA
+                        <p class="lowercase" style="display:inline">(unique values only)</p>
+                      </th>
+                    {% else %}
+                      <th>RRNAME</th>
+                    {% endif %}
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in group.rows %}
+                    <tr>
+                      <td>
+                        {% if group.is_rdata %}
+                          {{ pivot(row.raw_rdata, ["dnsdb rdata"], container_id, label=row.rdata) }}
+                        {% else %}
+                          {{ pivot(row.rrname, ["domain"], container_id) }}
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endfor %}
+        {% elif result.kind == "rrset" %}
+          <br>
+          <h3 class="wf-h3-style">RRSET Lookup</h3>
+          <br>
+          <div class="container">
+            <span>Type: &nbsp;</span>
+            <select id="rdata_type" class="wf-table-vertical" onchange="show_table(this)">
+              {% for group in result.groups %}
+                <option value="type_{{ group.rrtype }}">{{ group.rrtype }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% for group in result.groups %}
+            <div class="wf-table-div"
+                 id="type_{{ group.rrtype }}"
+                 style="{% if not loop.first %}display:none;
+                        {% endif %}width:100%">
+              <table id="rrtype_{{ group.rrtype }}_table"
+                     class="datatable wf-table-horizontal">
+                <thead>
+                  <tr>
+                    <td style="padding: 0px;border: 0px;color: #6c818b;">unique values only</td>
+                  </tr>
+                  <tr>
+                    {% if group.rrtype == "SOA" %}
+                      <th>Origin</th>
+                      <th>Mail Address</th>
+                      <th>Serial</th>
+                      <th>Refresh</th>
+                      <th>Retry</th>
+                      <th>Expire</th>
+                      <th>Minimum TTL</th>
+                    {% elif group.rrtype == "MX" %}
+                      <th>Preference</th>
+                      <th>Mail Exchange</th>
+                    {% else %}
+                      <th>{{ group.rrtype }}</th>
+                    {% endif %}
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in group.entries %}
+                    <tr>
+                      {% if group.rrtype == "SOA" %}
+                        <td>{{ pivot(item.rdata_origin, ["host name"], container_id) }}</td>
+                        <td>{{ pivot(item.rdata_mail_addr, ["email"], container_id) }}</td>
+                        <td>{{ item.rdata_serial }}</td>
+                        <td>{{ item.rdata_refresh }}</td>
+                        <td>{{ item.rdata_retry }}</td>
+                        <td>{{ item.rdata_expire }}</td>
+                        <td>{{ item.rdata_minimum }}</td>
+                      {% elif group.rrtype == "MX" %}
+                        <td>{{ item.rdata_preference }}</td>
+                        <td>{{ pivot(item.rdata_mail_exchange, ["domain"], container_id) }}</td>
+                      {% else %}
+                        <td>
+                          {% if group.rrtype == "A" %}
+                            {{ pivot(item, ["ip"], container_id) }}
+                          {% elif group.rrtype == "AAAA" %}
+                            {{ pivot(item, ["dnsdb ipv6"], container_id) }}
+                          {% elif group.rrtype in ["NS", "CNAME"] %}
+                            {{ pivot(item, ["domain"], container_id) }}
+                          {% else %}
+                            {{ item }}
+                          {% endif %}
+                        </td>
+                      {% endif %}
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endfor %}
+        {% else %}
+          {% set is_raw = result.kind == "rdata_raw" %}
+          {% set rdata_contains = ["ip", "dnsdb ipv6"] if result.kind == "rdata_ip" else ["domain"] %}
+          <div class="wf-table-div">
+            <h3 class="wf-h3-style">{{ "Raw RDATA Lookup" if is_raw else "RDATA Lookup" }}</h3>
+            <table id="{{ 'raw_rrname_table' if is_raw else 'rrname_table' }}"
+                   class="datatable wf-table-horizontal">
+              <thead>
+                <tr>
+                  <th>
+                    {{ "Result" if is_raw else "Domain" }}
+                    <p class="lowercase" style="display:inline">(unique values only)</p>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for domain in result.domains %}
+                  <tr>
+                    <td>{{ pivot(domain, ["domain"], container_id) }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="wf-table-div">
+            <h3 class="wf-h3-style">Detailed Information</h3>
+            <table id="{{ 'raw_rrname_detail_table' if is_raw else 'rrname_detail_table' }}"
+                   class="datatable wf-table-horizontal">
+              <thead>
+                <tr>
+                  <th>RRName</th>
+                  <th>RRType</th>
+                  <th>RData</th>
+                  <th>Count</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in result.rows %}
+                  {% set rdata_items = [row.rdata] if row.rdata is string else (row.rdata or []) %}
+                  <tr>
+                    <td>{{ pivot(row.rrname, ["domain"], container_id) }}</td>
+                    <td>{{ pivot(row.rrtype, ["dnsdb rrtype"], container_id) }}</td>
+                    <td>
+                      {% for rdata in rdata_items %}
+                        {{ pivot(rdata, rdata_contains, container_id) }}
+                      {% endfor %}
+                    </td>
+                    <td>{{ row.count }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  </div>
+  <script>
+  $.extend(true, $.fn.dataTable.defaults, {
+    "searching": true,
+    "bLengthChange": false,
+    "language": {
+      "paginate": {
+        "previous": "<i class='fa fa-angle-left fa-lg'></i>",
+        "next": "<i class='fa fa-angle-right fa-lg'></i>"
+      }
+    },
+    "dom": '<"top"if>rt<"bottom"p><"clear">',
+    drawCallback: function(settings) {
+      var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+      pagination.toggle(this.api().page.info().pages > 1);
+    }
+  });
+  $.fn.DataTable.ext.pager.numbers_length = 5;
+  $('.datatable').DataTable();
+
+  function show_table(e){
+    var type = $(e).val();
+    $('.wf-table-div').hide();
+    $('#'+type).show();
+  }
+  if (PHANTOM_THEME == "dark"){
+    let dt_info = document.getElementsByClassName("dataTables_info");
+    let dt_filter = document.getElementsByClassName("dataTables_filter");
+
+    for (let item of dt_info) {
+      item.style.color = "white";
+    }
+
+    for (let item of dt_filter) {
+      item.style.color = "white";
+    }
+  }
+  </script>
+{% endblock %}
