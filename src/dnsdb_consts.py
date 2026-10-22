@@ -70,6 +70,10 @@ DNSDB_DATA_NOT_AVAILABLE_MESSAGE = "Data not available"
 DNSDB_INVALID_TIME_FORMAT = "Invalid time format : {time}"
 DNSDB_INVALID_TIME = "Future date value is not allowed. Please provide valid datetime"
 DNSDB_INVALID_NETWORK_PREFIX = "Invalid network prefix : {prefix}"
+DNSDB_INVALID_IP = "Invalid IP address : {ip}"
+DNSDB_NETWORK_PREFIX_NEEDS_SINGLE_IP = (
+    "The 'network_prefix' parameter can only be used with a single IPv4 or IPv6 address"
+)
 DNSDB_INVALID_BAILIWICK = "Invalid bailiwick : {bailiwick}"
 DNSDB_INVALID_DOMAIN = "Parameter '{key}' failed validation"
 DNSDB_INVALID_HEX_RDATA = "raw_rdata must be an even-length hexadecimal string"

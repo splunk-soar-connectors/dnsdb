@@ -20,6 +20,7 @@ from ..asset import Asset
 from ..helpers import (
     format_unknown_error,
     get_client,
+    is_ip_address,
     is_ipv4,
     map_known_dnsdb_error,
     validate_integer,
@@ -27,7 +28,9 @@ from ..helpers import (
 )
 from ..dnsdb_consts import (
     DNSDB_DATA_NOT_AVAILABLE_MESSAGE,
+    DNSDB_INVALID_IP,
     DNSDB_INVALID_NETWORK_PREFIX,
+    DNSDB_NETWORK_PREFIX_NEEDS_SINGLE_IP,
 )
 
 
@@ -76,7 +79,13 @@ def lookup_rdata_ip(
     network_prefix = validate_integer(params.network_prefix, "network_prefix")
     limit = validate_integer(params.limit, "limit", default=200)
 
+    plain_ip = not any(sep in params.ip for sep in ",/-")
+    if plain_ip and not is_ip_address(params.ip):
+        raise ActionFailure(DNSDB_INVALID_IP.format(ip=params.ip))
+
     if network_prefix is not None:
+        if not plain_ip:
+            raise ActionFailure(DNSDB_NETWORK_PREFIX_NEEDS_SINGLE_IP)
         max_prefix = 32 if is_ipv4(params.ip) else 128
         if not (0 <= network_prefix <= max_prefix):
             raise ActionFailure(
