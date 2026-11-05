@@ -1,7 +1,7 @@
 # DNSDB
 
 Publisher: Splunk <br>
-Connector Version: 3.0.0 <br>
+Connector Version: 3.0.1 <br>
 Product Vendor: Farsight Security, Inc. <br>
 Product Name: DNSDB <br>
 Minimum Product Version: 7.0.0

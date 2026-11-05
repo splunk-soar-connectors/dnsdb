@@ -1,6 +1,6 @@
 [project]
 name = "dnsdb"
-version = "3.0.0"
+version = "3.0.1"
 description = "This app supports investigative DNS lookup actions on DNSDB"
 license = "Copyright (c) 2016-2026 Splunk Inc."
 requires-python = ">=3.13, <3.16, !=3.14.*"
